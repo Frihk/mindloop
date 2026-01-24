@@ -10,7 +10,7 @@ GOFILES=$(wildcard *.go)
 # Make is verbose in Linux. Make it silent.
 MAKEFLAGS += --silent
 
-.PHONY: all build build-cli build-server run-server test fmt clean help
+.PHONY: all build build-cli build-server run-server start-server kill-server test fmt clean help
 
 ## all: Build both CLI and Server binaries
 all: build
@@ -32,6 +32,50 @@ build-server:
 run-server:
 	@echo "  >  Running server..."
 	go run cmd/server/server.go
+
+## start-server: Build and run the server in background
+start-server: build-server
+	@if [ -f .mindloop-server.pid ]; then \
+		if ps -p $$(cat .mindloop-server.pid) > /dev/null 2>&1; then \
+			echo "  >  Server is already running (PID: $$(cat .mindloop-server.pid))"; \
+			exit 1; \
+		else \
+			echo "  >  Removing stale PID file..."; \
+			rm -f .mindloop-server.pid; \
+		fi; \
+	fi
+	@echo "  >  Starting server in background..."
+	@./$(SERVER_BINARY_NAME) > server.log 2>&1 & echo $$! > .mindloop-server.pid
+	@sleep 0.5
+	@if ps -p $$(cat .mindloop-server.pid) > /dev/null 2>&1; then \
+		echo "  >  Server started (PID: $$(cat .mindloop-server.pid))"; \
+		echo "  >  Logs: server.log"; \
+	else \
+		echo "  >  Server failed to start. Check server.log for errors."; \
+		rm -f .mindloop-server.pid; \
+		exit 1; \
+	fi
+
+## kill-server: Stop the background server
+kill-server:
+	@if [ ! -f .mindloop-server.pid ]; then \
+		echo "  >  No PID file found. Server may not be running."; \
+		exit 1; \
+	fi
+	@PID=$$(cat .mindloop-server.pid); \
+	if ps -p $$PID > /dev/null 2>&1; then \
+		echo "  >  Stopping server (PID: $$PID)..."; \
+		kill -TERM $$PID; \
+		sleep 1; \
+		if ps -p $$PID > /dev/null 2>&1; then \
+			echo "  >  Server still running, forcing shutdown..."; \
+			kill -9 $$PID; \
+		fi; \
+		echo "  >  Server stopped."; \
+	else \
+		echo "  >  Server process not found (stale PID: $$PID)."; \
+	fi
+	@rm -f .mindloop-server.pid
 
 ## test: Run all unit tests
 test:

@@ -23,7 +23,7 @@ import (
 
 const (
 	AppName = "Mindloop"
-	Port    = "8080"
+	Port    = "8765"
 )
 
 func CreateRouter(mlh *v1.MindloopHandler) (*mux.Router, error) {
@@ -74,7 +74,7 @@ func ServeMindloop(mlh *v1.MindloopHandler) {
 	}
 
 	srv := &http.Server{
-		Addr:      ":8080",
+		Addr:      ":8765",
 		Handler:   r,
 		TLSConfig: nil,
 	}
@@ -84,7 +84,7 @@ func ServeMindloop(mlh *v1.MindloopHandler) {
 	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
 
 	go func() {
-		log.Info().Msg("Starting Mindloop server on :8080")
+		log.Info().Msg("Starting Mindloop server on :8765")
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatal().Msgf("ListenAndServe(): %v", err)
 		}

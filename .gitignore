@@ -35,3 +35,7 @@ go.work.sum
 user_config.yaml
 mindloop_local.db
 mindloop.log
+
+# Server process management
+.mindloop-server.pid
+server.log
