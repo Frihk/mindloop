@@ -2,6 +2,10 @@
 BINARY_NAME=mindloop
 SERVER_BINARY_NAME=mindloop-server
 
+# Defaults for server configuration
+PORT ?= 8765
+MODE ?= local
+
 # Go related variables.
 GOBASE=$(shell pwd)
 GOBIN=$(GOBASE)/bin
@@ -30,8 +34,8 @@ build-server:
 
 ## run-server: Run the server directly
 run-server:
-	@echo "  >  Running server..."
-	go run cmd/server/server.go
+	@echo "  >  Running server on port $(PORT) in $(MODE) mode..."
+	go run cmd/server/server.go -port=$(PORT) -mode=$(MODE)
 
 ## start-server: Build and run the server in background
 start-server: build-server
@@ -44,8 +48,8 @@ start-server: build-server
 			rm -f .mindloop-server.pid; \
 		fi; \
 	fi
-	@echo "  >  Starting server in background..."
-	@./$(SERVER_BINARY_NAME) > server.log 2>&1 & echo $$! > .mindloop-server.pid
+	@echo "  >  Starting server in background on port $(PORT) in $(MODE) mode..."
+	@./$(SERVER_BINARY_NAME) -port=$(PORT) -mode=$(MODE) > server.log 2>&1 & echo $$! > .mindloop-server.pid
 	@sleep 0.5
 	@if ps -p $$(cat .mindloop-server.pid) > /dev/null 2>&1; then \
 		echo "  >  Server started (PID: $$(cat .mindloop-server.pid))"; \

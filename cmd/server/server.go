@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"net/http"
 	"os"
@@ -79,8 +80,9 @@ func ServeMindloop(mlh *v1.MindloopHandler) {
 		log.Fatal().Err(err).Msg("Error creating router")
 	}
 
+	appConfig := config.GetConfig()
 	srv := &http.Server{
-		Addr:      ":8765",
+		Addr:      appConfig.Port,
 		Handler:   r,
 		TLSConfig: nil,
 	}
@@ -90,7 +92,7 @@ func ServeMindloop(mlh *v1.MindloopHandler) {
 	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
 
 	go func() {
-		log.Info().Msg("Starting Mindloop server on :8765")
+		log.Info().Msgf("Starting Mindloop server on %s", appConfig.Port)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatal().Msgf("ListenAndServe(): %v", err)
 		}
@@ -108,8 +110,13 @@ func ServeMindloop(mlh *v1.MindloopHandler) {
 
 func main() {
 
+	// Parse flags
+	port := flag.String("port", Port, "Port to run the server on")
+	mode := flag.String("mode", "local", "Mode to run the server in (local, byodb, api)")
+	flag.Parse()
+
 	// Init global config
-	config.InitConfig(AppName, "local", fmt.Sprintf(":"+Port))
+	config.InitConfig(AppName, *mode, fmt.Sprintf(":%s", *port))
 	appConfig := config.GetConfig()
 
 	database, err := db.ConnectToDb(*appConfig)

@@ -75,15 +75,19 @@ func (s *Service) LogHabit(habitID string) (*models.Habit, *models.HabitLog, err
 	var res *gorm.DB
 	switch habit.Interval {
 	case models.Daily:
-		res = s.DB.Where("HabitID = ? AND EndedAt = ?", habit.ID, today).First(&existingLog)
+		res = s.DB.Where("HabitID = ? AND EndedAt = ?", habit.ID, today).Limit(1).Find(&existingLog)
 	case models.Weekly:
 		startOfWeek := time.Now().AddDate(0, 0, -int(time.Now().Weekday()))
 		endOfWeek := startOfWeek.AddDate(0, 0, 6).Truncate(24 * time.Hour)
 		endedAt = endOfWeek
-		res = s.DB.Where("HabitID = ? AND CreatedAt >= ? AND EndedAt <= ?", habit.ID, startOfWeek, endOfWeek).First(&existingLog)
+		res = s.DB.Where("HabitID = ? AND CreatedAt >= ? AND EndedAt <= ?", habit.ID, startOfWeek, endOfWeek).Limit(1).Find(&existingLog)
 	}
 
-	if res.Error == nil {
+	if res.Error != nil {
+		return nil, nil, res.Error
+	}
+
+	if res.RowsAffected > 0 {
 		// Log found
 		if existingLog.ActualCount >= habit.TargetCount {
 			return &habit, &existingLog, errors.New("habit already completed for interval")
@@ -95,10 +99,8 @@ func (s *Service) LogHabit(habitID string) (*models.Habit, *models.HabitLog, err
 			return nil, nil, err
 		}
 		return &habit, &existingLog, nil
-	} else if !errors.Is(res.Error, gorm.ErrRecordNotFound) {
-		return nil, nil, res.Error
 	}
-	// If ErrRecordNotFound, we just proceed to create a new one.
+	// If no record found (RowsAffected == 0), we just proceed to create a new one.
 
 	// Create new log
 	habitLog := &models.HabitLog{

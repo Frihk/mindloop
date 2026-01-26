@@ -63,7 +63,12 @@ Mindloop follows a clean architecture pattern, separating core business logic fr
     ```bash
     make run-server
     ```
-    This will start the server on port `8765`.
+    This will start the server on port `8765` (default).
+
+    To use a custom port or mode:
+    ```bash
+    make run-server PORT=9000 MODE=byodb
+    ```
     
     Access the UI at [http://localhost:8765](http://localhost:8765)
 
