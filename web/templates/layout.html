@@ -10,10 +10,22 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon_io/favicon-32x32.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/static/favicon_io/apple-touch-icon.png">
     <link rel="manifest" href="/static/favicon_io/site.webmanifest">
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href='{{ asset "/static/css/style.css" }}'>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        // Check for saved user preference early to prevent flash
+        (function () {
+            const currentTheme = localStorage.getItem('theme');
+            if (currentTheme) {
+                document.documentElement.classList.add(currentTheme);
+                if (currentTheme === 'dark-mode') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            }
+        })();
+    </script>
 </head>
 
 <body>
@@ -22,7 +34,7 @@
             <nav>
                 <a href="/" class="logo" style="text-decoration: none;">
                     <span
-                        style="background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Mindloop</span>
+                        style="background: var(--gradient-primary); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Mindloop</span>
                 </a>
                 <ul class="nav-links">
                     <li><a href="/" class="nav-link">Home</a></li>
@@ -32,6 +44,8 @@
                     <li><a href="/journal" class="nav-link">Journal</a></li>
                     <li><a href="/summary" class="nav-link">Summary</a></li>
                     <li><a href="/about" class="nav-link">About</a></li>
+                    <li><button id="theme-toggle" class="btn btn-sm btn-secondary"
+                            style="padding: 0.4rem 0.6rem;">🌙</button></li>
                 </ul>
             </nav>
         </div>
@@ -49,6 +63,34 @@
         {{ end }}
         {{ template "content" . }}
     </main>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeToggle = document.getElementById('theme-toggle');
+            const html = document.documentElement;
+            const icon = themeToggle;
+
+            // Sync icon on load
+            if (html.classList.contains('dark-mode')) {
+                icon.textContent = '☀️';
+            }
+
+            themeToggle.addEventListener('click', function () {
+                html.classList.toggle('dark-mode');
+                let theme = 'light';
+                if (html.classList.contains('dark-mode')) {
+                    theme = 'dark-mode';
+                    html.setAttribute('data-theme', 'dark');
+                    icon.textContent = '☀️';
+                } else {
+                    html.removeAttribute('data-theme');
+                    icon.textContent = '🌙';
+                }
+                localStorage.setItem('theme', theme);
+            });
+        });
+    </script>
 </body>
 
 </html>

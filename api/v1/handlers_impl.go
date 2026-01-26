@@ -1,22 +1,38 @@
 package v1
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/rs/zerolog/log"
+	"github.com/snehmatic/mindloop/internal/core/motivation"
 	"github.com/snehmatic/mindloop/models"
 )
+
+// --- Quote Handler ---
+
+func (mlh *MindloopHandler) HandleQuote(w http.ResponseWriter, r *http.Request) {
+	quote, err := motivation.FetchRandomQuote()
+	if err != nil {
+		log.Error().Err(err).Msg("Error fetching quote")
+		http.Error(w, "Failed to fetch quote", http.StatusServiceUnavailable)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(quote); err != nil {
+		log.Error().Err(err).Msg("Error encoding quote response")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	}
+}
 
 // --- Habit Handlers ---
 
 func (mlh *MindloopHandler) HandleHabitList(w http.ResponseWriter, r *http.Request) {
 	interval := r.URL.Query().Get("interval")
-	if interval == "" {
-		interval = string(models.Daily)
-	}
 
 	habits, err := mlh.habit.ListHabits(models.IntervalType(interval))
 	if err != nil {
@@ -35,6 +51,7 @@ func (mlh *MindloopHandler) HandleHabitList(w http.ResponseWriter, r *http.Reque
 		models.Habit
 		ActualCount int
 		ProgressPct int
+		Streak      int
 	}
 
 	var habitViews []HabitView
@@ -78,16 +95,21 @@ func (mlh *MindloopHandler) HandleHabitList(w http.ResponseWriter, r *http.Reque
 		if pct > 100 {
 			pct = 100
 		}
+
+		streak, _ := mlh.habit.CalculateStreak(h.ID, h.Interval)
+
 		habitViews = append(habitViews, HabitView{
 			Habit:       h,
 			ActualCount: actual,
 			ProgressPct: pct,
+			Streak:      streak,
 		})
 	}
 
 	data := map[string]interface{}{
-		"Title":  "Habits",
-		"Habits": habitViews,
+		"Title":           "Habits",
+		"Habits":          habitViews,
+		"CurrentInterval": interval,
 	}
 
 	// Pass query params as simple alerts
@@ -221,6 +243,18 @@ func (mlh *MindloopHandler) HandleIntentComplete(w http.ResponseWriter, r *http.
 	http.Redirect(w, r, "/intent", http.StatusSeeOther)
 }
 
+func (mlh *MindloopHandler) HandleIntentDelete(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Redirect(w, r, "/intent", http.StatusSeeOther)
+		return
+	}
+	id := r.FormValue("id")
+	if err := mlh.intent.DeleteIntent(id); err != nil {
+		log.Error().Err(err).Msg("Error deleting intent")
+	}
+	http.Redirect(w, r, "/intent", http.StatusSeeOther)
+}
+
 // --- Focus Handlers ---
 
 func (mlh *MindloopHandler) HandleFocus(w http.ResponseWriter, r *http.Request) {
@@ -263,6 +297,19 @@ func (mlh *MindloopHandler) HandleFocusStop(w http.ResponseWriter, r *http.Reque
 	http.Redirect(w, r, "/focus", http.StatusSeeOther)
 }
 
+func (mlh *MindloopHandler) HandleFocusDelete(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Redirect(w, r, "/focus", http.StatusSeeOther)
+		return
+	}
+	idStr := r.FormValue("id")
+	id, _ := strconv.Atoi(idStr)
+	if err := mlh.focus.DeleteSession(id); err != nil {
+		log.Error().Err(err).Msg("Error deleting focus session")
+	}
+	http.Redirect(w, r, "/focus", http.StatusSeeOther)
+}
+
 // --- Summary Handler ---
 
 func (mlh *MindloopHandler) HandleSummary(w http.ResponseWriter, r *http.Request) {
@@ -297,9 +344,18 @@ func (mlh *MindloopHandler) HandleSummary(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	// Charts Data
+	dailyFocus, labels, _ := mlh.summary.GetFocusSeries(start, now)
+	dailyHabits, _ := mlh.summary.GetHabitSeries(start, now)
+
 	mlh.renderTemplate(w, "summary.html", map[string]interface{}{
 		"Title":  "Summary",
 		"Report": report,
+		"Charts": map[string]interface{}{
+			"Labels":      labels,
+			"DailyFocus":  dailyFocus,
+			"DailyHabits": dailyHabits,
+		},
 	})
 }
 
@@ -345,6 +401,18 @@ func (mlh *MindloopHandler) HandleCleanSlate(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	http.Redirect(w, r, redirectURL+"?success=Data cleared successfully", http.StatusSeeOther)
+}
+
+func (mlh *MindloopHandler) HandleJournalDelete(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Redirect(w, r, "/journal", http.StatusSeeOther)
+		return
+	}
+	id := r.FormValue("id")
+	if err := mlh.journal.DeleteEntry(id); err != nil {
+		log.Error().Err(err).Msg("Error deleting journal entry")
+	}
+	http.Redirect(w, r, "/journal", http.StatusSeeOther)
 }
 
 func (mlh *MindloopHandler) HandleAbout(w http.ResponseWriter, r *http.Request) {
