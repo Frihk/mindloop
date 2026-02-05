@@ -12,6 +12,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/snehmatic/mindloop/internal/config"
+	"github.com/snehmatic/mindloop/internal/core/backup"
 	"github.com/snehmatic/mindloop/internal/core/focus"
 	"github.com/snehmatic/mindloop/internal/core/habit"
 	"github.com/snehmatic/mindloop/internal/core/intent"
@@ -31,6 +32,7 @@ type MindloopHandler struct {
 	focus   *focus.Service
 	intent  *intent.Service
 	summary *summary.Service
+	backup  *backup.Service
 }
 
 func NewMindloopHandler(
@@ -40,6 +42,7 @@ func NewMindloopHandler(
 	focus *focus.Service,
 	intent *intent.Service,
 	summary *summary.Service,
+	backup *backup.Service,
 ) *MindloopHandler {
 	return &MindloopHandler{
 		config:  config.GetConfig(),
@@ -49,6 +52,7 @@ func NewMindloopHandler(
 		focus:   focus,
 		intent:  intent,
 		summary: summary,
+		backup:  backup,
 	}
 }
 
