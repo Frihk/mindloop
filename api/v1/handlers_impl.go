@@ -112,6 +112,10 @@ func (mlh *MindloopHandler) HandleHabitList(w http.ResponseWriter, r *http.Reque
 		"CurrentInterval": interval,
 	}
 
+	// Fetch ended habits for history
+	endedHabits, _ := mlh.habit.ListEndedHabits()
+	data["EndedHabits"] = endedHabits
+
 	// Pass query params as simple alerts
 	if success := r.URL.Query().Get("success"); success == "true" {
 		data["SuccessMessage"] = "Action completed successfully"
@@ -132,11 +136,18 @@ func (mlh *MindloopHandler) HandleHabitCreate(w http.ResponseWriter, r *http.Req
 	title := r.FormValue("title")
 	targetCount, _ := strconv.Atoi(r.FormValue("target_count"))
 	interval := r.FormValue("interval")
+	endDateStr := r.FormValue("end_date")
 
 	habit := &models.Habit{
 		Title:       title,
 		TargetCount: targetCount,
 		Interval:    models.IntervalType(interval),
+	}
+
+	if endDateStr != "" {
+		if t, err := time.Parse("2006-01-02", endDateStr); err == nil {
+			habit.EndDate = &t
+		}
 	}
 
 	if err := mlh.habit.CreateHabit(habit); err != nil {
@@ -158,6 +169,7 @@ func (mlh *MindloopHandler) HandleHabitUpdate(w http.ResponseWriter, r *http.Req
 	title := r.FormValue("title")
 	targetCount, _ := strconv.Atoi(r.FormValue("target_count"))
 	interval := r.FormValue("interval")
+	endDateStr := r.FormValue("end_date")
 
 	h, err := mlh.habit.GetHabit(id)
 	if err != nil {
@@ -169,6 +181,14 @@ func (mlh *MindloopHandler) HandleHabitUpdate(w http.ResponseWriter, r *http.Req
 	h.Title = title
 	h.TargetCount = targetCount
 	h.Interval = models.IntervalType(interval)
+
+	if endDateStr != "" {
+		if t, err := time.Parse("2006-01-02", endDateStr); err == nil {
+			h.EndDate = &t
+		}
+	} else {
+		h.EndDate = nil
+	}
 
 	if err := mlh.habit.UpdateHabit(h); err != nil {
 		log.Error().Err(err).Msg("Error updating habit")

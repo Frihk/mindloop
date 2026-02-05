@@ -27,6 +27,7 @@ type Habit struct {
 	Description string       `gorm:"type:text" json:"description"`
 	Interval    IntervalType `gorm:"type:varchar(100)" json:"interval"`
 	TargetCount int          `gorm:"type:int" json:"target_count"`
+	EndDate     *time.Time   `json:"end_date,omitempty"`
 }
 
 // Defaults for Habit
@@ -102,15 +103,27 @@ type HabitView struct {
 	Description string       `json:"description"`
 	Interval    IntervalType `json:"interval"`
 	TargetCount int          `json:"target_count"`
+	EndDate     string       `json:"end_date"`
+	IsEnded     bool         `json:"is_ended"`
 }
 
 func ToHabitView(h Habit) HabitView {
+	ended := ""
+	isEnded := false
+	if h.EndDate != nil {
+		ended = h.EndDate.Format("2006-01-02")
+		if h.EndDate.Before(time.Now()) {
+			isEnded = true
+		}
+	}
 	return HabitView{
 		ID:          h.ID,
 		Title:       h.Title,
 		Description: h.Description,
 		Interval:    h.Interval,
 		TargetCount: h.TargetCount,
+		EndDate:     ended,
+		IsEnded:     isEnded,
 	}
 }
 
