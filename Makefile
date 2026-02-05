@@ -19,26 +19,18 @@ MAKEFLAGS += --silent
 ## all: Build both CLI and Server binaries
 all: build
 
-## build: Build both CLI and Server binaries
-build: build-cli build-server
-
-## build-cli: Build the CLI binary
-build-cli:
-	@echo "  >  Building CLI binary..."
+## build: Build the mindloop binary
+build:
+	@echo "  >  Building binary..."
 	go build -o $(BINARY_NAME) main.go
-
-## build-server: Build the Server binary
-build-server:
-	@echo "  >  Building Server binary..."
-	go build -o $(SERVER_BINARY_NAME) cmd/server/server.go
 
 ## run-server: Run the server directly
 run-server:
-	@echo "  >  Running server on port $(PORT) in $(MODE) mode..."
-	go run cmd/server/server.go -port=$(PORT) -mode=$(MODE)
+	@echo "  >  Running server on port $(PORT)..."
+	go run main.go server -p $(PORT)
 
 ## start-server: Build and run the server in background
-start-server: build-server
+start-server: build
 	@if [ -f .mindloop-server.pid ]; then \
 		if ps -p $$(cat .mindloop-server.pid) > /dev/null 2>&1; then \
 			echo "  >  Server is already running (PID: $$(cat .mindloop-server.pid))"; \
@@ -48,8 +40,8 @@ start-server: build-server
 			rm -f .mindloop-server.pid; \
 		fi; \
 	fi
-	@echo "  >  Starting server in background on port $(PORT) in $(MODE) mode..."
-	@./$(SERVER_BINARY_NAME) -port=$(PORT) -mode=$(MODE) > server.log 2>&1 & echo $$! > .mindloop-server.pid
+	@echo "  >  Starting server in background on port $(PORT)..."
+	@./$(BINARY_NAME) server -p $(PORT) > server.log 2>&1 & echo $$! > .mindloop-server.pid
 	@sleep 0.5
 	@if ps -p $$(cat .mindloop-server.pid) > /dev/null 2>&1; then \
 		echo "  >  Server started (PID: $$(cat .mindloop-server.pid))"; \
@@ -95,7 +87,7 @@ fmt:
 clean:
 	@echo "  >  Cleaning build cache..."
 	go clean
-	rm -f $(BINARY_NAME) $(SERVER_BINARY_NAME)
+	rm -f $(BINARY_NAME) $(SERVER_BINARY_NAME) server.log .mindloop-server.pid mindloop.log
 
 ## help: Show help
 help: Makefile

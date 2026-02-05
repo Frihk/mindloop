@@ -13,9 +13,8 @@ RUN go mod download
 # Copy source code
 COPY . .
 
-# Build CLI and Server binaries
+# Build CLI and Server binary
 RUN CGO_ENABLED=1 GOOS=linux go build -o mindloop main.go
-RUN CGO_ENABLED=1 GOOS=linux go build -o mindloop-server cmd/server/server.go
 
 # Final stage
 FROM alpine:latest
@@ -25,18 +24,14 @@ RUN apk add --no-cache libc6-compat ca-certificates
 
 WORKDIR /app
 
-# Copy binaries from builder
+# Copy binary from builder
 COPY --from=builder /app/mindloop /usr/local/bin/mindloop
-COPY --from=builder /app/mindloop-server /usr/local/bin/mindloop-server
-
-# Copy web assets
-COPY --from=builder /app/web ./web
 
 # Expose the default port
 EXPOSE 8765
 
-# Set the entrypoint to the server binary
-ENTRYPOINT ["mindloop-server"]
+# Set the entrypoint to the mindloop binary
+ENTRYPOINT ["mindloop"]
 
-# Default arguments for the server
-CMD ["-port=8765", "-mode=local"]
+# Default arguments to start the server
+CMD ["server", "--port=8765"]
