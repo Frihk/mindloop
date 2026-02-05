@@ -48,7 +48,7 @@
 
 <div class="grid">
     {{ range .Habits }}
-    <div class="card card-hover">
+    <div class="card card-hover" onclick="window.location='/habits/view/{{ .ID }}'" style="cursor: pointer;">
         <div class="flex-between mb-sm" style="align-items: flex-start;">
             <div>
                 <h3 class="mb-sm">{{ .Title }}</h3>
@@ -110,6 +110,9 @@
         </div>
         <div class="progress-container">
             <div class="progress-bar" style="--p: {{ .ProgressPct }}%; width: var(--p);"></div>
+        </div>
+        <div class="mt-md">
+            <a href="/habits/view/{{ .ID }}" class="text-xs font-bold" style="text-transform: uppercase; letter-spacing: 0.05em;">View Trends →</a>
         </div>
     </div>
 
