@@ -1,8 +1,7 @@
-package main
+package server
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"net/http"
 	"os"
@@ -13,22 +12,10 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
 	v1 "github.com/snehmatic/mindloop/api/v1"
-	"github.com/snehmatic/mindloop/db"
-	"github.com/snehmatic/mindloop/internal/config"
-	"github.com/snehmatic/mindloop/internal/core/focus"
-	"github.com/snehmatic/mindloop/internal/core/habit"
-	"github.com/snehmatic/mindloop/internal/core/intent"
-	"github.com/snehmatic/mindloop/internal/core/journal"
-	"github.com/snehmatic/mindloop/internal/core/summary"
 	"github.com/snehmatic/mindloop/web"
 )
 
-const (
-	AppName = "Mindloop"
-	Port    = "8765"
-)
-
-func CreateRouter(mlh *v1.MindloopHandler) (*mux.Router, error) {
+func CreateRouter(mlh *v1.MindloopHandler) *mux.Router {
 	r := mux.NewRouter()
 
 	// Static files from embedded FS
@@ -74,20 +61,15 @@ func CreateRouter(mlh *v1.MindloopHandler) (*mux.Router, error) {
 	r.HandleFunc("/about", mlh.HandleAbout).Methods("GET")
 	r.HandleFunc("/void", mlh.HandleVoid).Methods("GET")
 
-	return r, nil
+	return r
 }
 
-func ServeMindloop(mlh *v1.MindloopHandler) {
-	r, err := CreateRouter(mlh)
-	if err != nil {
-		log.Fatal().Err(err).Msg("Error creating router")
-	}
+func Serve(mlh *v1.MindloopHandler, port string) {
+	r := CreateRouter(mlh)
 
-	appConfig := config.GetConfig()
 	srv := &http.Server{
-		Addr:      appConfig.Port,
-		Handler:   r,
-		TLSConfig: nil,
+		Addr:    ":" + port,
+		Handler: r,
 	}
 
 	// Graceful shutdown
@@ -95,52 +77,23 @@ func ServeMindloop(mlh *v1.MindloopHandler) {
 	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
 
 	go func() {
-		log.Info().Msgf("Starting Mindloop server on %s", appConfig.Port)
+		fmt.Printf("🚀 Starting Mindloop server on http://localhost:%s
+", port)
+		log.Info().Msgf("Starting Mindloop server on %s", port)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatal().Msgf("ListenAndServe(): %v", err)
 		}
 	}()
 
 	<-stop
+	fmt.Println("
+Shutting down server...")
 	log.Info().Msg("Shutting down server...")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
 		log.Fatal().Msgf("Server Shutdown Failed:%+v", err)
 	}
+	fmt.Println("Server exited properly")
 	log.Info().Msg("Server exited properly")
-}
-
-func main() {
-
-	// Parse flags
-	port := flag.String("port", Port, "Port to run the server on")
-	mode := flag.String("mode", "local", "Mode to run the server in (local, byodb, api)")
-	flag.Parse()
-
-	// Init global config
-	config.InitConfig(AppName, *mode, fmt.Sprintf(":%s", *port))
-	appConfig := config.GetConfig()
-
-	database, err := db.ConnectToDb(*appConfig)
-	if err != nil {
-		log.Fatal().Err(err).Msg("Error connecting to DB")
-	}
-
-	// Initialize core services
-	journalService := journal.NewService(database)
-	focusService := focus.NewService(database)
-	intentService := intent.NewService(database)
-	summaryService := summary.NewService(database)
-	habitService := habit.NewService(database)
-
-	mlh := v1.NewMindloopHandler(
-		journalService,
-		habitService,
-		focusService,
-		intentService,
-		summaryService,
-	)
-
-	ServeMindloop(mlh)
 }

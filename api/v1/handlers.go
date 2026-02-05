@@ -18,6 +18,7 @@ import (
 	"github.com/snehmatic/mindloop/internal/core/summary"
 	"github.com/snehmatic/mindloop/internal/utils"
 	"github.com/snehmatic/mindloop/models"
+	"github.com/snehmatic/mindloop/web"
 )
 
 type MindloopHandler struct {
@@ -47,21 +48,9 @@ func NewMindloopHandler(
 }
 
 func (mlh *MindloopHandler) renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
-	cwd, _ := filepath.Abs(".")
-	// Define the base layout and the specific template
-	basePath := filepath.Join(cwd, "web/templates")
-	if _, err := os.Stat(basePath); os.IsNotExist(err) {
-		// Try going up levels for tests
-		if _, err := os.Stat(filepath.Join(cwd, "../web/templates")); err == nil {
-			cwd = filepath.Join(cwd, "..")
-		} else if _, err := os.Stat(filepath.Join(cwd, "../../web/templates")); err == nil {
-			cwd = filepath.Join(cwd, "../..")
-		}
-	}
-
 	files := []string{
-		filepath.Join(cwd, "web/templates/layout.html"),
-		filepath.Join(cwd, "web/templates/", tmpl),
+		"templates/layout.html",
+		"templates/" + tmpl,
 	}
 
 	ts := template.New("layout.html").Funcs(template.FuncMap{
@@ -81,7 +70,7 @@ func (mlh *MindloopHandler) renderTemplate(w http.ResponseWriter, tmpl string, d
 		},
 	})
 
-	ts, err := ts.ParseFiles(files...)
+	ts, err := ts.ParseFS(web.WebFS, files...)
 	if err != nil {
 		log.Error().Err(err).Msg("Error parsing templates")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
