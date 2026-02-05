@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
 	"github.com/snehmatic/mindloop/internal/core/motivation"
 	"github.com/snehmatic/mindloop/models"
@@ -197,6 +198,46 @@ func (mlh *MindloopHandler) HandleHabitUpdate(w http.ResponseWriter, r *http.Req
 	}
 
 	http.Redirect(w, r, "/habits?success=true", http.StatusSeeOther)
+}
+
+func (mlh *MindloopHandler) HandleHabitView(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	h, err := mlh.habit.GetHabit(id)
+	if err != nil {
+		log.Error().Err(err).Msg("Error fetching habit for view")
+		http.Redirect(w, r, "/habits?error=Habit not found", http.StatusSeeOther)
+		return
+	}
+
+	logs, err := mlh.habit.ListLogsForHabit(h.ID)
+	if err != nil {
+		log.Error().Err(err).Msg("Error fetching logs for habit")
+	}
+
+	// Prepare heatmap data: map[date_string]completion_ratio
+	heatmap := make(map[string]float64)
+	for _, log := range logs {
+		dateStr := log.CreatedAt.Format("2006-01-02")
+		ratio := 0.0
+		if log.TargetCount > 0 {
+			ratio = float64(log.ActualCount) / float64(log.TargetCount)
+		}
+		if ratio > 1 {
+			ratio = 1
+		}
+		heatmap[dateStr] = ratio
+	}
+
+	streak, _ := mlh.habit.CalculateStreak(h.ID, h.Interval)
+
+	mlh.renderTemplate(w, "habit_view.html", map[string]interface{}{
+		"Title":   "Habit: " + h.Title,
+		"Habit":   h,
+		"Heatmap": heatmap,
+		"Streak":  streak,
+	})
 }
 
 func (mlh *MindloopHandler) HandleHabitLog(w http.ResponseWriter, r *http.Request) {
