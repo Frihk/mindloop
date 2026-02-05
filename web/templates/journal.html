@@ -46,9 +46,38 @@
                 <input type="hidden" name="id" value="{{ .ID }}">
                 <button type="submit" class="btn btn-danger-outline btn-sm" title="Delete">🗑️</button>
             </form>
+            <button onclick="toggleEditJournal('{{ .ID }}')" class="btn btn-secondary btn-sm" title="Edit">✏️</button>
         </div>
-        <p>{{ .Content }}</p>
-        <small class="text-muted">{{ .CreatedAt.Format "Jan 02, 2006 15:04" }}</small>
+        <div id="display-journal-{{ .ID }}">
+            <p>{{ .Content }}</p>
+            <small class="text-muted">{{ .CreatedAt.Format "Jan 02, 2006 15:04" }}</small>
+        </div>
+
+        <!-- Edit Form -->
+        <div id="edit-journal-{{ .ID }}" style="display: none; margin-top: 1rem;">
+            <form action="/journal/update" method="POST">
+                <input type="hidden" name="id" value="{{ .ID }}">
+                <div class="form-group">
+                    <input type="text" name="title" value="{{ .Title }}" required>
+                </div>
+                <div class="form-group">
+                    <select name="mood">
+                        <option value="neutral" {{ if eq .Mood "neutral" }}selected{{ end }}>Neutral 😐</option>
+                        <option value="happy" {{ if eq .Mood "happy" }}selected{{ end }}>Happy 😊</option>
+                        <option value="sad" {{ if eq .Mood "sad" }}selected{{ end }}>Sad 😔</option>
+                        <option value="energetic" {{ if eq .Mood "energetic" }}selected{{ end }}>Energetic ⚡</option>
+                        <option value="calm" {{ if eq .Mood "calm" }}selected{{ end }}>Calm 😌</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <textarea name="content" rows="4" required>{{ .Content }}</textarea>
+                </div>
+                <div class="flex-between">
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="toggleEditJournal('{{ .ID }}')">Cancel</button>
+                    <button type="submit" class="btn btn-sm btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
     </div>
     {{ end }}
     {{ else }}
@@ -57,4 +86,18 @@
     </div>
     {{ end }}
 </div>
+
+<script>
+    function toggleEditJournal(id) {
+        const display = document.getElementById('display-journal-' + id);
+        const form = document.getElementById('edit-journal-' + id);
+        if (form.style.display === 'none') {
+            form.style.display = 'block';
+            display.style.display = 'none';
+        } else {
+            form.style.display = 'none';
+            display.style.display = 'block';
+        }
+    }
+</script>
 {{ end }}

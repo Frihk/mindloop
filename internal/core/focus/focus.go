@@ -43,6 +43,18 @@ func (s *Service) ListSessions() ([]models.FocusSession, error) {
 	return sessions, result.Error
 }
 
+func (s *Service) GetSession(id int) (*models.FocusSession, error) {
+	var session models.FocusSession
+	if err := s.DB.First(&session, id).Error; err != nil {
+		return nil, err
+	}
+	return &session, nil
+}
+
+func (s *Service) UpdateSession(session *models.FocusSession) error {
+	return s.DB.Save(session).Error
+}
+
 func (s *Service) EndSession(id int) (*models.FocusSession, error) {
 	var session models.FocusSession
 	if err := s.DB.First(&session, id).Error; err != nil {

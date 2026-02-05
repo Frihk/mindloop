@@ -58,7 +58,18 @@ func (s *Service) ListHabits(interval models.IntervalType) ([]models.Habit, erro
 	if interval != "" {
 		query = query.Where("interval = ?", interval)
 	}
+	// Only show habits that haven't ended yet
+	now := time.Now()
+	query = query.Where("EndDate IS NULL OR EndDate > ?", now)
+
 	result := query.Find(&habits)
+	return habits, result.Error
+}
+
+func (s *Service) ListEndedHabits() ([]models.Habit, error) {
+	var habits []models.Habit
+	now := time.Now()
+	result := s.DB.Where("EndDate IS NOT NULL AND EndDate <= ?", now).Find(&habits)
 	return habits, result.Error
 }
 

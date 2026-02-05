@@ -25,7 +25,7 @@
             <input type="text" id="title" name="title" required placeholder="e.g. Read 10 pages">
         </div>
         <div class="grid"
-            style="grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; align-items: start;">
+            style="grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; align-items: start;">
             <div class="flex-col">
                 <label for="interval">Interval</label>
                 <select id="interval" name="interval" style="height: 42px;">
@@ -36,6 +36,10 @@
             <div class="flex-col">
                 <label for="target_count">Target Count</label>
                 <input type="number" id="target_count" name="target_count" value="1" min="1" style="height: 42px;">
+            </div>
+            <div class="flex-col">
+                <label for="end_date">End Date (Optional)</label>
+                <input type="date" id="end_date" name="end_date" style="height: 42px;">
             </div>
         </div>
         <div class="flex-between">
@@ -79,7 +83,30 @@
                     <input type="hidden" name="habit_id" value="{{ .ID }}">
                     <button type="submit" class="btn btn-danger-outline btn-sm" style="padding: 0.4rem;">🗑️</button>
                 </form>
+                <button onclick="toggleEditHabit('{{ .ID }}')" class="btn btn-secondary btn-sm" style="padding: 0.4rem;" title="Edit">✏️</button>
             </div>
+        </div>
+
+        <!-- Edit Form (Hidden by default) -->
+        <div id="edit-habit-{{ .ID }}" style="display: none; margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 1rem;">
+            <form action="/habits/update" method="POST">
+                <input type="hidden" name="id" value="{{ .ID }}">
+                <div class="form-group">
+                    <input type="text" name="title" value="{{ .Title }}" required>
+                </div>
+                <div class="grid" style="grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <select name="interval">
+                        <option value="daily" {{ if eq .Interval "daily" }}selected{{ end }}>Daily</option>
+                        <option value="weekly" {{ if eq .Interval "weekly" }}selected{{ end }}>Weekly</option>
+                    </select>
+                    <input type="number" name="target_count" value="{{ .TargetCount }}" min="1">
+                    <input type="date" name="end_date" value="{{ .EndDate }}">
+                </div>
+                <div class="flex-between">
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="toggleEditHabit('{{ .ID }}')">Cancel</button>
+                    <button type="submit" class="btn btn-sm btn-primary">Save</button>
+                </div>
+            </form>
         </div>
 
         <div class="flex-between mb-sm mt-md">
@@ -101,4 +128,34 @@
     </div>
     {{ end }}
 </div>
+
+{{ if .EndedHabits }}
+<div class="mt-xl">
+    <h2 class="mb-md">Habit History</h2>
+    <div class="grid">
+        {{ range .EndedHabits }}
+        <div class="card" style="opacity: 0.7;">
+            <div class="flex-between mb-sm">
+                <h3 class="mb-0 text-muted">{{ .Title }}</h3>
+                <span class="text-xs text-muted">Ended: {{ .EndDate.Format "Jan 02, 2006" }}</span>
+            </div>
+            <div class="mt-md">
+                <a href="/habits/view/{{ .ID }}" class="text-xs font-bold" style="text-transform: uppercase; letter-spacing: 0.05em;">View Results →</a>
+            </div>
+        </div>
+        {{ end }}
+    </div>
+</div>
+{{ end }}
+
+<script>
+    function toggleEditHabit(id) {
+        const form = document.getElementById('edit-habit-' + id);
+        if (form.style.display === 'none') {
+            form.style.display = 'block';
+        } else {
+            form.style.display = 'none';
+        }
+    }
+</script>
 {{ end }}
