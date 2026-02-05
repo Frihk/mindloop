@@ -452,6 +452,26 @@ func (mlh *MindloopHandler) HandleJournalDelete(w http.ResponseWriter, r *http.R
 	http.Redirect(w, r, "/journal", http.StatusSeeOther)
 }
 
+func (mlh *MindloopHandler) HandleJournalView(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	entry, err := mlh.journal.GetEntry(id)
+	if err != nil {
+		log.Error().Err(err).Msg("Error fetching journal entry for view")
+		http.Redirect(w, r, "/journal?error=Entry not found", http.StatusSeeOther)
+		return
+	}
+
+	htmlContent := mdToHTML([]byte(entry.Content))
+
+	mlh.renderTemplate(w, "journal_view.html", map[string]interface{}{
+		"Title":       "View Journal",
+		"Entry":       entry,
+		"HTMLContent": template.HTML(htmlContent),
+	})
+}
+
 // --- Note Handlers ---
 
 func (mlh *MindloopHandler) HandleNoteList(w http.ResponseWriter, r *http.Request) {

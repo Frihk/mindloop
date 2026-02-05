@@ -46,6 +46,7 @@
                 <input type="hidden" name="id" value="{{ .ID }}">
                 <button type="submit" class="btn btn-danger-outline btn-sm" title="Delete">🗑️</button>
             </form>
+            <a href="/journal/view/{{ .ID }}" class="btn btn-secondary btn-sm">View Full</a>
         </div>
         <p>{{ .Content }}</p>
         <small class="text-muted">{{ .CreatedAt.Format "Jan 02, 2006 15:04" }}</small>

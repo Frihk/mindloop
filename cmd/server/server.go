@@ -41,6 +41,7 @@ func CreateRouter(mlh *v1.MindloopHandler) (*mux.Router, error) {
 	// Journal Routes
 	r.HandleFunc("/journal", mlh.HandleJournalList).Methods("GET")
 	r.HandleFunc("/journal/new", mlh.HandleJournalCreate).Methods("POST")
+	r.HandleFunc("/journal/view/{id}", mlh.HandleJournalView).Methods("GET")
 	r.HandleFunc("/journal/delete", mlh.HandleJournalDelete).Methods("POST")
 
 	// Note Routes
