@@ -111,8 +111,18 @@
                         <input type="hidden" name="id" value="{{ .ID }}">
                         <button type="submit" class="btn btn-danger-outline btn-sm" title="Delete">🗑️</button>
                     </form>
+                    <button onclick="toggleEditFocus('{{ .ID }}')" class="btn btn-secondary btn-sm" title="Edit">✏️</button>
                     {{ end }}
                 </div>
+            </div>
+            <!-- Edit Form -->
+            <div id="edit-focus-{{ .ID }}" style="display: none; padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); background: var(--secondary-light);">
+                <form action="/focus/update" method="POST" class="flex-center gap-sm">
+                    <input type="hidden" name="id" value="{{ .ID }}">
+                    <input type="text" name="title" value="{{ .Title }}" required style="flex: 1;">
+                    <button type="submit" class="btn btn-sm btn-primary">Save</button>
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="toggleEditFocus('{{ .ID }}')">Cancel</button>
+                </form>
             </div>
             {{ end }}
         </div>
@@ -123,4 +133,15 @@
         {{ end }}
     </div>
 </div>
+
+<script>
+    function toggleEditFocus(id) {
+        const form = document.getElementById('edit-focus-' + id);
+        if (form.style.display === 'none') {
+            form.style.display = 'block';
+        } else {
+            form.style.display = 'none';
+        }
+    }
+</script>
 {{ end }}

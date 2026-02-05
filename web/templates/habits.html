@@ -79,7 +79,29 @@
                     <input type="hidden" name="habit_id" value="{{ .ID }}">
                     <button type="submit" class="btn btn-danger-outline btn-sm" style="padding: 0.4rem;">🗑️</button>
                 </form>
+                <button onclick="toggleEditHabit('{{ .ID }}')" class="btn btn-secondary btn-sm" style="padding: 0.4rem;" title="Edit">✏️</button>
             </div>
+        </div>
+
+        <!-- Edit Form (Hidden by default) -->
+        <div id="edit-habit-{{ .ID }}" style="display: none; margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 1rem;">
+            <form action="/habits/update" method="POST">
+                <input type="hidden" name="id" value="{{ .ID }}">
+                <div class="form-group">
+                    <input type="text" name="title" value="{{ .Title }}" required>
+                </div>
+                <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <select name="interval">
+                        <option value="daily" {{ if eq .Interval "daily" }}selected{{ end }}>Daily</option>
+                        <option value="weekly" {{ if eq .Interval "weekly" }}selected{{ end }}>Weekly</option>
+                    </select>
+                    <input type="number" name="target_count" value="{{ .TargetCount }}" min="1">
+                </div>
+                <div class="flex-between">
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="toggleEditHabit('{{ .ID }}')">Cancel</button>
+                    <button type="submit" class="btn btn-sm btn-primary">Save</button>
+                </div>
+            </form>
         </div>
 
         <div class="flex-between mb-sm mt-md">
@@ -101,4 +123,15 @@
     </div>
     {{ end }}
 </div>
+
+<script>
+    function toggleEditHabit(id) {
+        const form = document.getElementById('edit-habit-' + id);
+        if (form.style.display === 'none') {
+            form.style.display = 'block';
+        } else {
+            form.style.display = 'none';
+        }
+    }
+</script>
 {{ end }}

@@ -6,7 +6,20 @@
     <div class="text-label mb-sm"
         style="text-transform: uppercase; letter-spacing: 0.1em; color: var(--primary); font-weight: 700;">
         Today's Focus</div>
-    <h1 style="font-size: 3.5rem; margin-bottom: 2rem; line-height: 1.2;">{{ .CurrentIntent.Name }}</h1>
+    
+    <div id="intent-display">
+        <h1 style="font-size: 3.5rem; margin-bottom: 2rem; line-height: 1.2;">{{ .CurrentIntent.Name }}</h1>
+    </div>
+
+    <!-- Edit Form (Hidden) -->
+    <div id="intent-edit-form" style="display: none; max-width: 600px; margin: 0 auto 2rem auto;">
+        <form action="/intent/update" method="POST" class="flex-center gap-sm">
+            <input type="hidden" name="id" value="{{ .CurrentIntent.ID }}">
+            <input type="text" name="name" value="{{ .CurrentIntent.Name }}" required style="font-size: 1.5rem; text-align: center;">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="button" class="btn btn-secondary" onclick="toggleEditIntent()">Cancel</button>
+        </form>
+    </div>
 
     <div id="motivation-display" style="display: none; max-width: 600px; margin: 0 auto 2rem auto;"></div>
 
@@ -17,6 +30,9 @@
                 Mark as Complete
             </button>
         </form>
+        <button onclick="toggleEditIntent()" class="btn btn-secondary" style="padding: 1rem 2rem; font-size: 1.2rem;">
+            Edit ✏️
+        </button>
         <button onclick="showMotivation()" class="btn btn-premium-outline"
             style="padding: 1rem 2rem; font-size: 1.2rem;">
             Motivate Me 💡
@@ -78,5 +94,18 @@
     {{ end }}
 </div>
 
+<script>
+    function toggleEditIntent() {
+        const display = document.getElementById('intent-display');
+        const form = document.getElementById('intent-edit-form');
+        if (form.style.display === 'none') {
+            form.style.display = 'block';
+            display.style.display = 'none';
+        } else {
+            form.style.display = 'none';
+            display.style.display = 'block';
+        }
+    }
+</script>
 <script src='{{ asset "/static/js/motivation.js" }}'></script>
 {{ end }}
