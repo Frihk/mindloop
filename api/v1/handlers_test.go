@@ -9,6 +9,7 @@ import (
 
 	v1 "github.com/snehmatic/mindloop/api/v1"
 	"github.com/snehmatic/mindloop/internal/config"
+	"github.com/snehmatic/mindloop/internal/core/backup"
 	"github.com/snehmatic/mindloop/internal/core/focus"
 	"github.com/snehmatic/mindloop/internal/core/habit"
 	"github.com/snehmatic/mindloop/internal/core/intent"
@@ -54,6 +55,7 @@ func setupTestServer(t *testing.T) *v1.MindloopHandler {
 	intentService := intent.NewService(database)
 	summaryService := summary.NewService(database)
 	habitService := habit.NewService(database)
+	backupService := backup.NewService(database)
 
 	return v1.NewMindloopHandler(
 		journalService,
@@ -62,6 +64,7 @@ func setupTestServer(t *testing.T) *v1.MindloopHandler {
 		focusService,
 		intentService,
 		summaryService,
+		backupService,
 	)
 }
 
