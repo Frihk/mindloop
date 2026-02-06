@@ -1,0 +1,165 @@
+{{ define "content" }}
+<div class="mb-lg">
+    <a href="/habits" class="text-sm">← Back to Habits</a>
+</div>
+
+<div class="card mb-md">
+    <div class="flex-between mobile-stack">
+        <div>
+            <h1 class="mb-xs">{{ .Habit.Title }}</h1>
+            <p class="text-muted mb-0">{{ .Habit.Interval | title }} • Target: {{ .Habit.TargetCount }}</p>
+        </div>
+        <div class="flex-center gap-md">
+            {{ if gt .Streak 0 }}
+            <div class="stat-card" style="text-align: center; background: #ffedd5; border: 1px solid #fed7aa; padding: 0.5rem 1rem; border-radius: var(--radius-md);">
+                <div style="font-size: 1.5rem;">🔥 {{ .Streak }}</div>
+                <div class="text-xs" style="color: #c2410c; font-weight: 700; text-transform: uppercase;">Day Streak</div>
+            </div>
+            {{ end }}
+            <button onclick="toggleEditHabit('{{ .Habit.ID }}')" class="btn btn-secondary">Edit Habit ✏️</button>
+        </div>
+    </div>
+
+    <!-- Edit Form (Hidden) -->
+    <div id="edit-habit-{{ .Habit.ID }}" style="display: none; margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 2rem;">
+        <form action="/habits/update" method="POST" style="max-width: 500px;">
+            <input type="hidden" name="id" value="{{ .Habit.ID }}">
+            <div class="form-group">
+                <label for="title">Habit Title</label>
+                <input type="text" name="title" value="{{ .Habit.Title }}" required>
+            </div>
+            <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div class="flex-col">
+                    <label for="interval">Interval</label>
+                    <select name="interval">
+                        <option value="daily" {{ if eq .Habit.Interval "daily" }}selected{{ end }}>Daily</option>
+                        <option value="weekly" {{ if eq .Habit.Interval "weekly" }}selected{{ end }}>Weekly</option>
+                    </select>
+                </div>
+                <div class="flex-col">
+                    <label for="target_count">Target Count</label>
+                    <input type="number" name="target_count" value="{{ .Habit.TargetCount }}" min="1">
+                </div>
+            </div>
+            <div class="flex-between">
+                <button type="button" class="btn btn-secondary" onclick="toggleEditHabit('{{ .Habit.ID }}')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <h3 class="mb-lg">Activity Heatmap</h3>
+    
+    <div id="heatmap-container" style="overflow-x: auto; padding-bottom: 1rem;">
+        <!-- Heatmap will be rendered via JS for simplicity in handling dates -->
+        <div id="habit-heatmap" class="heatmap"></div>
+    </div>
+
+    <div class="flex-center gap-md mt-md" style="justify-content: flex-start;">
+        <span class="text-xs text-muted">Less</span>
+        <div style="display: flex; gap: 4px;">
+            <div class="heatmap-cell" style="background: var(--secondary-light);"></div>
+            <div class="heatmap-cell" style="background: #c7d2fe;"></div>
+            <div class="heatmap-cell" style="background: #818cf8;"></div>
+            <div class="heatmap-cell" style="background: #4f46e5;"></div>
+            <div class="heatmap-cell" style="background: var(--primary);"></div>
+        </div>
+        <span class="text-xs text-muted">More</span>
+    </div>
+</div>
+
+<style>
+    .heatmap {
+        display: grid;
+        grid-template-flow: column;
+        grid-template-columns: repeat(53, 14px);
+        grid-template-rows: repeat(7, 14px);
+        gap: 4px;
+    }
+    .heatmap-cell {
+        width: 14px;
+        height: 14px;
+        border-radius: 2px;
+        background: var(--secondary-light);
+        cursor: pointer;
+    }
+    .heatmap-cell:hover {
+        border: 1px solid var(--text-muted);
+    }
+    .tooltip {
+        position: absolute;
+        background: #1e293b;
+        color: white;
+        padding: 0.4rem 0.8rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        z-index: 100;
+        pointer-events: none;
+        display: none;
+    }
+</style>
+
+<div id="heatmap-tooltip" class="tooltip"></div>
+
+<script>
+    const heatmapData = {{ .Heatmap | json }};
+    const habitInterval = "{{ .Habit.Interval }}";
+
+    function renderHeatmap() {
+        const container = document.getElementById('habit-heatmap');
+        const tooltip = document.getElementById('heatmap-tooltip');
+        
+        // Render last 371 days (53 weeks)
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        // Start from 52 weeks ago, aligned to Sunday
+        const startDate = new Date(today);
+        startDate.setDate(today.getDate() - 364);
+        while (startDate.getDay() !== 0) {
+            startDate.setDate(startDate.getDate() - 1);
+        }
+
+        for (let i = 0; i < 371; i++) {
+            const date = new Date(startDate);
+            date.setDate(startDate.getDate() + i);
+            
+            const dateStr = date.toISOString().split('T')[0];
+            const ratio = heatmapData[dateStr] || 0;
+            
+            const cell = document.createElement('div');
+            cell.className = 'heatmap-cell';
+            
+            // Set color based on ratio
+            if (ratio > 0) {
+                if (ratio >= 1) cell.style.background = 'var(--primary)';
+                else if (ratio > 0.7) cell.style.background = '#4f46e5';
+                else if (ratio > 0.4) cell.style.background = '#818cf8';
+                else cell.style.background = '#c7d2fe';
+            }
+
+            // Tooltip
+            cell.onmouseover = (e) => {
+                tooltip.style.display = 'block';
+                tooltip.innerText = `${date.toDateString()}: ${Math.round(ratio * 100)}%`;
+                tooltip.style.left = (e.pageX + 10) + 'px';
+                tooltip.style.top = (e.pageY - 30) + 'px';
+            };
+            cell.onmouseout = () => {
+                tooltip.style.display = 'none';
+            };
+
+            container.appendChild(cell);
+        }
+    }
+
+    function toggleEditHabit(id) {
+        const form = document.getElementById('edit-habit-' + id);
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
+
+    document.addEventListener('DOMContentLoaded', renderHeatmap);
+</script>
+{{ end }}

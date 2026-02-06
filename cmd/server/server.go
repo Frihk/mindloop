@@ -54,6 +54,7 @@ func CreateRouter(mlh *v1.MindloopHandler) (*mux.Router, error) {
 	// Habit Routes
 	r.HandleFunc("/habits", mlh.HandleHabitList).Methods("GET")
 	r.HandleFunc("/habits/new", mlh.HandleHabitCreate).Methods("POST")
+	r.HandleFunc("/habits/view/{id}", mlh.HandleHabitView).Methods("GET")
 	r.HandleFunc("/habits/update", mlh.HandleHabitUpdate).Methods("POST")
 	r.HandleFunc("/habits/log", mlh.HandleHabitLog).Methods("POST")
 	r.HandleFunc("/habits/unlog", mlh.HandleHabitUnlog).Methods("POST")
