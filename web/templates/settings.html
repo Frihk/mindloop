@@ -82,6 +82,30 @@
             <button type="submit" class="btn btn-primary">Save Settings</button>
         </div>
     </form>
+
+    <hr style="margin: 3rem 0; border: 0; border-top: 1px solid var(--border);">
+
+    <!-- Backup & Restore Section -->
+    <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <div>
+            <h3>Backup Data</h3>
+            <p class="text-sm text-muted">Export all your local data (intents, habits, focus sessions, journal, and notes) to a JSON file for safe-keeping.</p>
+            <a href="/backup/export" class="btn btn-secondary">
+                📥 Export Backup (.json)
+            </a>
+        </div>
+
+        <div>
+            <h3>Restore Data</h3>
+            <p class="text-sm text-muted">Restore your data from a backup file. <strong>Warning: This will replace all your current local data!</strong></p>
+            <form action="/backup/import" method="POST" enctype="multipart/form-data" class="flex-center gap-sm" style="justify-content: flex-start;">
+                <input type="file" name="backup_file" accept=".json" required style="width: auto; font-size: 0.85rem; padding: 0.5rem;">
+                <button type="submit" class="btn btn-danger-outline btn-sm" onclick="return confirm('Are you sure you want to restore? ALL current data will be overwritten.')">
+                    📤 Restore
+                </button>
+            </form>
+        </div>
+    </div>
 </div>
 
 <script>
