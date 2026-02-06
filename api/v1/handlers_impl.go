@@ -170,6 +170,37 @@ func (mlh *MindloopHandler) HandleHabitCreate(w http.ResponseWriter, r *http.Req
 	http.Redirect(w, r, "/habits?success=true", http.StatusSeeOther)
 }
 
+func (mlh *MindloopHandler) HandleHabitUpdate(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Redirect(w, r, "/habits", http.StatusSeeOther)
+		return
+	}
+
+	id := r.FormValue("id")
+	title := r.FormValue("title")
+	targetCount, _ := strconv.Atoi(r.FormValue("target_count"))
+	interval := r.FormValue("interval")
+
+	h, err := mlh.habit.GetHabit(id)
+	if err != nil {
+		log.Error().Err(err).Msg("Error fetching habit for update")
+		http.Redirect(w, r, "/habits?error=Habit not found", http.StatusSeeOther)
+		return
+	}
+
+	h.Title = title
+	h.TargetCount = targetCount
+	h.Interval = models.IntervalType(interval)
+
+	if err := mlh.habit.UpdateHabit(h); err != nil {
+		log.Error().Err(err).Msg("Error updating habit")
+		http.Redirect(w, r, "/habits?error=Failed to update habit", http.StatusSeeOther)
+		return
+	}
+
+	http.Redirect(w, r, "/habits?success=true", http.StatusSeeOther)
+}
+
 func (mlh *MindloopHandler) HandleHabitLog(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Redirect(w, r, "/habits", http.StatusSeeOther)
@@ -247,6 +278,33 @@ func (mlh *MindloopHandler) HandleIntentSet(w http.ResponseWriter, r *http.Reque
 	_, err := mlh.intent.StartIntent(name)
 	if err != nil {
 		log.Error().Err(err).Msg("Error setting intent")
+	}
+
+	http.Redirect(w, r, "/intent", http.StatusSeeOther)
+}
+
+func (mlh *MindloopHandler) HandleIntentUpdate(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Redirect(w, r, "/intent", http.StatusSeeOther)
+		return
+	}
+
+	id := r.FormValue("id")
+	name := r.FormValue("name")
+
+	i, err := mlh.intent.GetIntent(id)
+	if err != nil {
+		log.Error().Err(err).Msg("Error fetching intent for update")
+		http.Redirect(w, r, "/intent?error=Intent not found", http.StatusSeeOther)
+		return
+	}
+
+	i.Name = name
+
+	if err := mlh.intent.UpdateIntent(i); err != nil {
+		log.Error().Err(err).Msg("Error updating intent")
+		http.Redirect(w, r, "/intent?error=Failed to update intent", http.StatusSeeOther)
+		return
 	}
 
 	http.Redirect(w, r, "/intent", http.StatusSeeOther)
@@ -344,6 +402,34 @@ func (mlh *MindloopHandler) HandleFocusDelete(w http.ResponseWriter, r *http.Req
 		http.Redirect(w, r, "/focus?error="+err.Error(), http.StatusSeeOther)
 		return
 	}
+	http.Redirect(w, r, "/focus?success=true", http.StatusSeeOther)
+}
+
+func (mlh *MindloopHandler) HandleFocusUpdate(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Redirect(w, r, "/focus", http.StatusSeeOther)
+		return
+	}
+
+	idStr := r.FormValue("id")
+	id, _ := strconv.Atoi(idStr)
+	title := r.FormValue("title")
+
+	session, err := mlh.focus.GetSession(id)
+	if err != nil {
+		log.Error().Err(err).Msg("Error fetching focus session for update")
+		http.Redirect(w, r, "/focus?error=Session not found", http.StatusSeeOther)
+		return
+	}
+
+	session.Title = title
+
+	if err := mlh.focus.UpdateSession(session); err != nil {
+		log.Error().Err(err).Msg("Error updating focus session")
+		http.Redirect(w, r, "/focus?error=Failed to update session", http.StatusSeeOther)
+		return
+	}
+
 	http.Redirect(w, r, "/focus?success=true", http.StatusSeeOther)
 }
 
@@ -455,6 +541,35 @@ func (mlh *MindloopHandler) HandleJournalDelete(w http.ResponseWriter, r *http.R
 	http.Redirect(w, r, "/journal", http.StatusSeeOther)
 }
 
+func (mlh *MindloopHandler) HandleJournalUpdate(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Redirect(w, r, "/journal", http.StatusSeeOther)
+		return
+	}
+
+	id := r.FormValue("id")
+	title := r.FormValue("title")
+	content := r.FormValue("content")
+	mood := r.FormValue("mood")
+
+	entry, err := mlh.journal.GetEntry(id)
+	if err != nil {
+		log.Error().Err(err).Msg("Error fetching journal entry for update")
+		http.Redirect(w, r, "/journal?error=Entry not found", http.StatusSeeOther)
+		return
+	}
+
+	entry.Title = title
+	entry.Content = content
+	entry.Mood = mood
+
+	if err := mlh.journal.UpdateEntry(&entry); err != nil {
+		log.Error().Err(err).Msg("Error updating journal entry")
+		http.Redirect(w, r, "/journal?error=Failed to update entry", http.StatusSeeOther)
+		return
+	}
+
+	http.Redirect(w, r, "/journal", http.StatusSeeOther)
 // --- Note Handlers ---
 
 func (mlh *MindloopHandler) HandleNoteList(w http.ResponseWriter, r *http.Request) {

@@ -47,6 +47,10 @@ func (s *Service) GetEntry(id string) (models.JournalEntry, error) {
 	return entry, result.Error
 }
 
+func (s *Service) UpdateEntry(entry *models.JournalEntry) error {
+	return s.DB.Save(entry).Error
+}
+
 func (s *Service) DeleteEntry(id string) error {
 	result := s.DB.Delete(&models.JournalEntry{}, "id = ?", id)
 	return result.Error
