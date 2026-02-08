@@ -100,7 +100,7 @@
                         <option value="weekly" {{ if eq .Interval "weekly" }}selected{{ end }}>Weekly</option>
                     </select>
                     <input type="number" name="target_count" value="{{ .TargetCount }}" min="1">
-                    <input type="date" name="end_date" value="{{ .EndDate }}">
+                    <input type="date" name="end_date" value="{{ if .EndDate }}{{ .EndDate.Format "2006-01-02" }}{{ end }}">
                 </div>
                 <div class="flex-between">
                     <button type="button" class="btn btn-sm btn-secondary" onclick="toggleEditHabit('{{ .ID }}')">Cancel</button>
@@ -150,7 +150,6 @@
     </div>
 </div>
 {{ end }}
-
 <script>
     function toggleEditHabit(id) {
         const form = document.getElementById('edit-habit-' + id);

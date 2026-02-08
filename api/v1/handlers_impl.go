@@ -651,7 +651,6 @@ func (mlh *MindloopHandler) HandleJournalView(w http.ResponseWriter, r *http.Req
 		"HTMLContent": template.HTML(htmlContent),
 	})
 }
-
 // --- Note Handlers ---
 
 func (mlh *MindloopHandler) HandleNoteList(w http.ResponseWriter, r *http.Request) {
@@ -736,7 +735,6 @@ func (mlh *MindloopHandler) HandleNoteDelete(w http.ResponseWriter, r *http.Requ
 
 	http.Redirect(w, r, "/notes?success=true", http.StatusSeeOther)
 }
-
 func (mlh *MindloopHandler) HandleAbout(w http.ResponseWriter, r *http.Request) {
 	mlh.renderTemplate(w, "about.html", map[string]interface{}{
 		"Title": "About",
