@@ -95,11 +95,10 @@ func (mlh *MindloopHandler) HandleHabitList(w http.ResponseWriter, r *http.Reque
 						isToday = true
 					}
 				} else {
-					// Weekly check simplified
-					// For weekly, we check if created_at is within this week.
-					year, week := time.Now().ISOWeek()
-					logYear, logWeek := log.CreatedAt.ISOWeek()
-					if year == logYear && week == logWeek {
+					// Weekly check: match ISO week
+					y1, w1 := log.CreatedAt.ISOWeek()
+					y2, w2 := time.Now().ISOWeek()
+					if y1 == y2 && w1 == w2 {
 						isToday = true
 					}
 				}
@@ -313,17 +312,18 @@ func (mlh *MindloopHandler) HandleHabitDelete(w http.ResponseWriter, r *http.Req
 // --- Intent Handlers ---
 
 func (mlh *MindloopHandler) HandleIntent(w http.ResponseWriter, r *http.Request) {
-	activeIntents, _ := mlh.intent.ListActiveIntents()
+	currentIntent, _ := mlh.intent.GetOngoingIntent()
 	allIntents, _ := mlh.intent.ListIntents()
 
-	var currentIntent *models.Intent
-	if len(activeIntents) > 0 {
-		currentIntent = &activeIntents[0] // Just take the first active one
+	var currentQuest *models.SideQuest
+	if q, err := mlh.quest.GetActiveQuest(); err == nil {
+		currentQuest = q
 	}
 
 	mlh.renderTemplate(w, "intent.html", map[string]interface{}{
 		"Title":         "Intent",
 		"CurrentIntent": currentIntent,
+		"CurrentQuest":  currentQuest,
 		"History":       allIntents,
 	})
 }

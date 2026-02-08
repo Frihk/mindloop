@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -16,6 +17,7 @@ import (
 	"github.com/snehmatic/mindloop/internal/core/intent"
 	"github.com/snehmatic/mindloop/internal/core/journal"
 	"github.com/snehmatic/mindloop/internal/core/note"
+	"github.com/snehmatic/mindloop/internal/core/quest"
 	"github.com/snehmatic/mindloop/internal/core/summary"
 	"github.com/snehmatic/mindloop/internal/utils"
 	"github.com/snehmatic/mindloop/models"
@@ -29,6 +31,7 @@ type MindloopHandler struct {
 	habit   *habit.Service
 	focus   *focus.Service
 	intent  *intent.Service
+	quest   *quest.Service
 	summary *summary.Service
 	backup  *backup.Service
 }
@@ -39,6 +42,7 @@ func NewMindloopHandler(
 	habit *habit.Service,
 	focus *focus.Service,
 	intent *intent.Service,
+	quest *quest.Service,
 	summary *summary.Service,
 	backup *backup.Service,
 ) *MindloopHandler {
@@ -49,6 +53,7 @@ func NewMindloopHandler(
 		habit:   habit,
 		focus:   focus,
 		intent:  intent,
+		quest:   quest,
 		summary: summary,
 		backup:  backup,
 	}
@@ -64,6 +69,13 @@ func (mlh *MindloopHandler) renderTemplate(w http.ResponseWriter, tmpl string, d
 		"json": func(v interface{}) template.JS {
 			a, _ := json.Marshal(v)
 			return template.JS(a)
+		},
+		"title": func(v any) string {
+			s := fmt.Sprint(v)
+			if len(s) == 0 {
+				return ""
+			}
+			return strings.ToUpper(s[:1]) + strings.ToLower(s[1:])
 		},
 		"iso8601": func(t time.Time) string {
 			return t.Format(time.RFC3339)
@@ -98,19 +110,25 @@ func (mlh *MindloopHandler) renderTemplate(w http.ResponseWriter, tmpl string, d
 		return
 	}
 
-	err = ts.Execute(w, data)
+	var buf strings.Builder
+	err = ts.Execute(&buf, data)
 	if err != nil {
 		log.Error().Err(err).Msg("Error executing template")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
 	}
+
+	_, _ = fmt.Fprint(w, buf.String())
 }
 
 func (mlh *MindloopHandler) HandleHome(w http.ResponseWriter, r *http.Request) {
-	// 1. Active Intent
-	activeIntents, _ := mlh.intent.ListActiveIntents()
-	var currentIntent *models.Intent
-	if len(activeIntents) > 0 {
-		currentIntent = &activeIntents[0]
+	// 1. Ongoing Intent (Active or Paused)
+	currentIntent, _ := mlh.intent.GetOngoingIntent()
+
+	// 1b. Active Side Quest
+	var currentQuest *models.SideQuest
+	if q, err := mlh.quest.GetActiveQuest(); err == nil {
+		currentQuest = q
 	}
 
 	// 2. Focus Time Today
@@ -141,6 +159,7 @@ func (mlh *MindloopHandler) HandleHome(w http.ResponseWriter, r *http.Request) {
 		"Title": "Home",
 		"Dashboard": map[string]interface{}{
 			"CurrentIntent":   currentIntent,
+			"CurrentQuest":    currentQuest,
 			"FocusMinutes":    focusMinutes,
 			"CompletedHabits": completedHabits,
 			"TotalHabits":     totalHabits,
@@ -182,4 +201,88 @@ func (mlh *MindloopHandler) HandleJournalCreate(w http.ResponseWriter, r *http.R
 
 func (mlh *MindloopHandler) HandleHealthz(w http.ResponseWriter, r *http.Request) {
 	utils.WriteResponse([]byte("OK"), w, http.StatusOK)
+}
+
+// --- Quest Handlers ---
+
+func (mlh *MindloopHandler) HandleQuestStart(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Redirect(w, r, "/intent", http.StatusSeeOther)
+		return
+	}
+
+	title := r.FormValue("title")
+
+	// 1. Pause Intent
+	currentIntent, _ := mlh.intent.GetOngoingIntent()
+	if currentIntent != nil && currentIntent.Status == "active" {
+		_, _ = mlh.intent.PauseIntent(currentIntent.ID)
+	}
+
+	// 2. Pause Focus
+	activeFocus, _ := mlh.focus.GetActiveSession()
+	if activeFocus != nil {
+		_, _ = mlh.focus.PauseSession(activeFocus.ID)
+	}
+
+	// 3. Start Quest
+	_, _ = mlh.quest.StartQuest(title)
+
+	http.Redirect(w, r, "/intent", http.StatusSeeOther)
+}
+
+func (mlh *MindloopHandler) HandleQuestStop(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Redirect(w, r, "/intent", http.StatusSeeOther)
+		return
+	}
+
+	idStr := r.FormValue("id")
+	id, _ := strconv.ParseUint(idStr, 10, 32)
+	note := r.FormValue("note")
+
+	_, _ = mlh.quest.StopQuest(uint(id), note)
+
+	// Auto-resume intent if one is paused
+	currentIntent, _ := mlh.intent.GetOngoingIntent()
+	if currentIntent != nil && currentIntent.Status == "paused" {
+		_, _ = mlh.intent.ResumeIntent(currentIntent.ID)
+	}
+
+	http.Redirect(w, r, "/intent", http.StatusSeeOther)
+}
+
+func (mlh *MindloopHandler) HandleQuestDelete(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Redirect(w, r, "/intent", http.StatusSeeOther)
+		return
+	}
+
+	idStr := r.FormValue("id")
+	id, _ := strconv.ParseUint(idStr, 10, 32)
+
+	_ = mlh.quest.DeleteQuest(uint(id))
+
+	http.Redirect(w, r, "/intent", http.StatusSeeOther)
+}
+
+func (mlh *MindloopHandler) HandleIntentResume(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Redirect(w, r, "/intent", http.StatusSeeOther)
+		return
+	}
+
+	idStr := r.FormValue("id")
+	id, _ := strconv.ParseUint(idStr, 10, 32)
+
+	// 1. Resume the intent
+	_, _ = mlh.intent.ResumeIntent(uint(id))
+
+	// 2. Automatically complete any active side quest
+	activeQuest, _ := mlh.quest.GetActiveQuest()
+	if activeQuest != nil {
+		_, _ = mlh.quest.StopQuest(activeQuest.ID, "Resumed main intent")
+	}
+
+	http.Redirect(w, r, "/intent", http.StatusSeeOther)
 }

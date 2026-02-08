@@ -44,6 +44,18 @@ func (s *Service) ListActiveIntents() ([]models.Intent, error) {
 	return intents, result.Error
 }
 
+func (s *Service) GetOngoingIntent() (*models.Intent, error) {
+	var intents []models.Intent
+	result := s.DB.Where("status IN ?", []string{"active", "paused"}).Limit(1).Find(&intents)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	if len(intents) == 0 {
+		return nil, nil
+	}
+	return &intents[0], nil
+}
+
 func (s *Service) GetIntent(id string) (*models.Intent, error) {
 	var intent models.Intent
 	if err := s.DB.Where("id = ?", id).First(&intent).Error; err != nil {
@@ -79,4 +91,38 @@ func (s *Service) DeleteIntent(id string) error {
 
 func (s *Service) DeleteAll() error {
 	return s.DB.Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(&models.Intent{}).Error
+}
+
+func (s *Service) PauseIntent(id uint) (*models.Intent, error) {
+	var intent models.Intent
+	if err := s.DB.First(&intent, id).Error; err != nil {
+		return nil, err
+	}
+
+	if intent.Status != "active" {
+		return nil, errors.New("intent is not active")
+	}
+
+	intent.Status = "paused"
+	if err := s.DB.Save(&intent).Error; err != nil {
+		return nil, err
+	}
+	return &intent, nil
+}
+
+func (s *Service) ResumeIntent(id uint) (*models.Intent, error) {
+	var intent models.Intent
+	if err := s.DB.First(&intent, id).Error; err != nil {
+		return nil, err
+	}
+
+	if intent.Status != "paused" {
+		return nil, errors.New("intent is not paused")
+	}
+
+	intent.Status = "active"
+	if err := s.DB.Save(&intent).Error; err != nil {
+		return nil, err
+	}
+	return &intent, nil
 }

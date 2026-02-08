@@ -21,6 +21,7 @@ import (
 	"github.com/snehmatic/mindloop/internal/core/intent"
 	"github.com/snehmatic/mindloop/internal/core/journal"
 	"github.com/snehmatic/mindloop/internal/core/note"
+	"github.com/snehmatic/mindloop/internal/core/quest"
 	"github.com/snehmatic/mindloop/internal/core/summary"
 	"github.com/snehmatic/mindloop/web"
 )
@@ -76,6 +77,12 @@ func CreateRouter(mlh *v1.MindloopHandler) (*mux.Router, error) {
 	r.HandleFunc("/intent/update", mlh.HandleIntentUpdate).Methods("POST")
 	r.HandleFunc("/intent/complete", mlh.HandleIntentComplete).Methods("POST")
 	r.HandleFunc("/intent/delete", mlh.HandleIntentDelete).Methods("POST")
+	r.HandleFunc("/intent/resume", mlh.HandleIntentResume).Methods("POST")
+
+	// Quest Routes
+	r.HandleFunc("/quest/start", mlh.HandleQuestStart).Methods("POST")
+	r.HandleFunc("/quest/stop", mlh.HandleQuestStop).Methods("POST")
+	r.HandleFunc("/quest/delete", mlh.HandleQuestDelete).Methods("POST")
 
 	// Summary Route
 	r.HandleFunc("/summary", mlh.HandleSummary).Methods("GET")
@@ -155,6 +162,7 @@ func main() {
 	backupService := backup.NewService(database)
 	focusService := focus.NewService(database)
 	intentService := intent.NewService(database)
+	questService := quest.NewService(database)
 	summaryService := summary.NewService(database)
 	habitService := habit.NewService(database)
 
@@ -164,6 +172,7 @@ func main() {
 		habitService,
 		focusService,
 		intentService,
+		questService,
 		summaryService,
 		backupService,
 	)
