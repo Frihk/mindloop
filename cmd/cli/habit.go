@@ -13,7 +13,6 @@ import (
 )
 
 var (
-	all          *bool
 	daily        *bool
 	weekly       *bool
 	interactive  *bool
@@ -314,7 +313,7 @@ func init() {
 	habitLogCmd.AddCommand(habitLogShowCmd)
 
 	// flags
-	all = habitCmd.PersistentFlags().BoolP("all", "A", false, "Select all habits") // not using now
+	// all = habitCmd.PersistentFlags().BoolP("all", "A", false, "Select all habits") // not using now
 	daily = habitCmd.PersistentFlags().BoolP("daily", "d", false, "Set habit as daily")
 	weekly = habitCmd.PersistentFlags().BoolP("weekly", "w", false, "Set habit as weekly")
 	interactive = habitCmd.PersistentFlags().BoolP("interactive", "i", false, "Interactive mode for adding habit")
@@ -359,7 +358,7 @@ func BuildHabitFromInteractiveMode(hb *models.Habit) *models.Habit {
 
 	fmt.Print("Enter target count (default 1): ")
 	var targetCount int
-	fmt.Scanln(&targetCount)
+	_, _ = fmt.Scanln(&targetCount)
 	if targetCount > 0 {
 		hb.TargetCount = targetCount
 	}
@@ -367,7 +366,7 @@ func BuildHabitFromInteractiveMode(hb *models.Habit) *models.Habit {
 	for {
 		fmt.Print("Select interval (daily/weekly, default daily): ")
 		var interval string
-		fmt.Scanln(&interval)
+		_, _ = fmt.Scanln(&interval)
 		if interval != "" {
 			if !models.IsValidIntervalType(interval) {
 				ac.Logger.Error().

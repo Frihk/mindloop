@@ -45,7 +45,7 @@ var restoreCmd = &cobra.Command{
 		PrintWarnf("Restoring data from %s. All existing local data will be replaced!\n", filePath)
 		PrintInfoln("Type 'yes' to confirm:")
 		var confirm string
-		fmt.Scanln(&confirm)
+		_, _ = fmt.Scanln(&confirm)
 		if confirm != "yes" {
 			PrintInfoln("Restore cancelled.")
 			return
