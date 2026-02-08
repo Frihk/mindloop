@@ -29,7 +29,7 @@
 </div>
 
 <div class="entries" style="margin-top: 2rem;">
-    <div class="flex-between mb-md">
+    <div class="flex-between mobile-stack mb-md">
         <h2 class="mb-0">Recent Entries</h2>
         <form action="/cleanslate" method="POST" onsubmit="return confirm('Delete all journal entries?');" class="mb-0">
             <input type="hidden" name="type" value="journal">
@@ -46,7 +46,10 @@
                 <input type="hidden" name="id" value="{{ .ID }}">
                 <button type="submit" class="btn btn-danger-outline btn-sm" title="Delete">🗑️</button>
             </form>
-            <button onclick="toggleEditJournal('{{ .ID }}')" class="btn btn-secondary btn-sm" title="Edit">✏️</button>
+            <div class="flex-center" style="gap: 0.5rem;">
+                <a href="/journal/view/{{ .ID }}" class="btn btn-secondary btn-sm">View Full</a>
+                <button onclick="toggleEditJournal('{{ .ID }}')" class="btn btn-secondary btn-sm" title="Edit">✏️</button>
+            </div>
         </div>
         <div id="display-journal-{{ .ID }}">
             <p>{{ .Content }}</p>

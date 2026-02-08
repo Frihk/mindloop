@@ -177,6 +177,12 @@ func (s *Service) ListHabitLogs(interval models.IntervalType) ([]models.HabitLog
 	return habitLogs, result.Error
 }
 
+func (s *Service) ListLogsForHabit(habitID uint) ([]models.HabitLog, error) {
+	var habitLogs []models.HabitLog
+	result := s.DB.Where("HabitID = ?", habitID).Order("CreatedAt ASC").Find(&habitLogs)
+	return habitLogs, result.Error
+}
+
 func (s *Service) DeleteAll() error {
 	// Transaction to delete both logs and habits
 	return s.DB.Transaction(func(tx *gorm.DB) error {
