@@ -44,6 +44,18 @@ func (s *Service) ListActiveIntents() ([]models.Intent, error) {
 	return intents, result.Error
 }
 
+func (s *Service) GetIntent(id string) (*models.Intent, error) {
+	var intent models.Intent
+	if err := s.DB.Where("id = ?", id).First(&intent).Error; err != nil {
+		return nil, err
+	}
+	return &intent, nil
+}
+
+func (s *Service) UpdateIntent(intent *models.Intent) error {
+	return s.DB.Save(intent).Error
+}
+
 func (s *Service) EndIntent(idStr string) (*models.Intent, error) {
 	var intent models.Intent
 	if err := s.DB.Where("id = ?", idStr).First(&intent).Error; err != nil {

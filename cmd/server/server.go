@@ -15,6 +15,7 @@ import (
 	v1 "github.com/snehmatic/mindloop/api/v1"
 	"github.com/snehmatic/mindloop/db"
 	"github.com/snehmatic/mindloop/internal/config"
+	"github.com/snehmatic/mindloop/internal/core/backup"
 	"github.com/snehmatic/mindloop/internal/core/focus"
 	"github.com/snehmatic/mindloop/internal/core/habit"
 	"github.com/snehmatic/mindloop/internal/core/intent"
@@ -42,6 +43,7 @@ func CreateRouter(mlh *v1.MindloopHandler) (*mux.Router, error) {
 	r.HandleFunc("/journal", mlh.HandleJournalList).Methods("GET")
 	r.HandleFunc("/journal/new", mlh.HandleJournalCreate).Methods("POST")
 	r.HandleFunc("/journal/view/{id}", mlh.HandleJournalView).Methods("GET")
+	r.HandleFunc("/journal/update", mlh.HandleJournalUpdate).Methods("POST")
 	r.HandleFunc("/journal/delete", mlh.HandleJournalDelete).Methods("POST")
 
 	// Note Routes
@@ -53,6 +55,8 @@ func CreateRouter(mlh *v1.MindloopHandler) (*mux.Router, error) {
 	// Habit Routes
 	r.HandleFunc("/habits", mlh.HandleHabitList).Methods("GET")
 	r.HandleFunc("/habits/new", mlh.HandleHabitCreate).Methods("POST")
+	r.HandleFunc("/habits/view/{id}", mlh.HandleHabitView).Methods("GET")
+	r.HandleFunc("/habits/update", mlh.HandleHabitUpdate).Methods("POST")
 	r.HandleFunc("/habits/log", mlh.HandleHabitLog).Methods("POST")
 	r.HandleFunc("/habits/unlog", mlh.HandleHabitUnlog).Methods("POST")
 	r.HandleFunc("/habits/delete", mlh.HandleHabitDelete).Methods("POST")
@@ -60,17 +64,27 @@ func CreateRouter(mlh *v1.MindloopHandler) (*mux.Router, error) {
 	// Focus Routes
 	r.HandleFunc("/focus", mlh.HandleFocus).Methods("GET")
 	r.HandleFunc("/focus/start", mlh.HandleFocusStart).Methods("POST")
+	r.HandleFunc("/focus/update", mlh.HandleFocusUpdate).Methods("POST")
 	r.HandleFunc("/focus/stop", mlh.HandleFocusStop).Methods("POST")
 	r.HandleFunc("/focus/delete", mlh.HandleFocusDelete).Methods("POST")
 
 	// Intent Routes
 	r.HandleFunc("/intent", mlh.HandleIntent).Methods("GET")
 	r.HandleFunc("/intent/set", mlh.HandleIntentSet).Methods("POST")
+	r.HandleFunc("/intent/update", mlh.HandleIntentUpdate).Methods("POST")
 	r.HandleFunc("/intent/complete", mlh.HandleIntentComplete).Methods("POST")
 	r.HandleFunc("/intent/delete", mlh.HandleIntentDelete).Methods("POST")
 
 	// Summary Route
 	r.HandleFunc("/summary", mlh.HandleSummary).Methods("GET")
+
+	// Settings Route
+	r.HandleFunc("/settings", mlh.HandleSettings).Methods("GET")
+	r.HandleFunc("/settings/update", mlh.HandleSettingsUpdate).Methods("POST")
+
+	// Backup Routes
+	r.HandleFunc("/backup/export", mlh.HandleBackupExport).Methods("GET")
+	r.HandleFunc("/backup/import", mlh.HandleBackupImport).Methods("POST")
 
 	// Quote Route
 	r.HandleFunc("/api/quote", mlh.HandleQuote).Methods("GET")
@@ -136,6 +150,7 @@ func main() {
 	// Initialize core services
 	journalService := journal.NewService(database)
 	noteService := note.NewService(database)
+	backupService := backup.NewService(database)
 	focusService := focus.NewService(database)
 	intentService := intent.NewService(database)
 	summaryService := summary.NewService(database)
@@ -148,6 +163,7 @@ func main() {
 		focusService,
 		intentService,
 		summaryService,
+		backupService,
 	)
 
 	ServeMindloop(mlh)

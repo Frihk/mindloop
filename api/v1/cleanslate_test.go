@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/snehmatic/mindloop/internal/core/backup"
 	"github.com/snehmatic/mindloop/internal/core/focus"
 	"github.com/snehmatic/mindloop/internal/core/habit"
 	"github.com/snehmatic/mindloop/internal/core/intent"
@@ -43,8 +44,9 @@ func setupCleanSlateTest(t *testing.T) (*MindloopHandler, *gorm.DB) {
 	fService := focus.NewService(db)
 	iService := intent.NewService(db)
 	sService := summary.NewService(db)
+	bService := backup.NewService(db)
 
-	mlh := NewMindloopHandler(jService, nService, hService, fService, iService, sService)
+	mlh := NewMindloopHandler(jService, nService, hService, fService, iService, sService, bService)
 	return mlh, db
 }
 
