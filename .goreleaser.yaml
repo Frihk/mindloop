@@ -19,7 +19,7 @@ builds:
       - amd64
       - arm64
     ldflags:
-      - -s -w
+      - -s -w -X github.com/snehmatic/mindloop/internal/config.Version={{.Version}}
 
 archives:
   - formats: 
@@ -68,3 +68,9 @@ brews:
     
     install: |
       bin.install "mindloop"
+
+    service: |
+      run [opt_bin/"mindloop", "server"]
+      keep_alive true
+      log_path var/"log/mindloop.log"
+      error_log_path var/"log/mindloop.log"

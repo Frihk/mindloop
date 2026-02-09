@@ -17,6 +17,7 @@ var ac *config.Config
 
 var rootCmd = &cobra.Command{
 	Use:       "mindloop",
+	Version:   config.Version,
 	Short:     "mindloop is a CLI tool for productivity tracking",
 	Long:      `Mindloop helps track intent, focus sessions, and habits via CLI.`,
 	Example:   `mindloop intent start "Get this work done"`,

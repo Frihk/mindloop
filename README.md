@@ -55,13 +55,14 @@ Mindloop follows a clean architecture pattern, separating core business logic fr
     *   `summary`: Aggregates data for productivity reporting.
 
 *   **Interfaces (Presentation Layer):**
-    *   **CLI (`cmd/cli`):** Built with [Cobra](https://github.com/spf13/cobra), this interface interacts directly with the local database for low-latency command-line usage. Check out the [CLI Usage Guide](docs/CLI_USAGE.md) for detailed command instructions.
+    *   **CLI (`cmd/cli`):** Built with [Cobra](https://github.com/spf13/cobra), this interface interacts directly with the local database for low-latency command-line usage. Use `mindloop --version` to check your current version. Check out the [CLI Usage Guide](docs/CLI_USAGE.md) for detailed command instructions.
     *   **Web Server (`cmd/server`):** A Go HTTP server exposing a REST API (`api/v1`).
     *   **Web UI:** Server-Side Rendered (SSR) HTML templates (`web/templates`) utilizing vanilla CSS/JS. "Vibe coded" with Gemini (backend-focused developer approach).
 
 *   **Data Layer:**
     *   Uses [GORM](https://gorm.io/) for ORM capabilities.
-    *   **Default:** Zero-config SQLite (`mindloop_local.db`) for a true local-first experience.
+    *   **Default:** Zero-config SQLite (`mindloop_local.db`).
+    *   **Universal Storage:** By default, data is stored in `~/.mindloop/` to ensure persistence across different working directories. It also checks for a local `mindloop_local.db` in the current directory for project-specific overrides.
     *   **Optional:** Supports PostgreSQL via configuration (BYODB mode).
 
 ---
@@ -80,6 +81,12 @@ The easiest way to install and keep Mindloop updated.
 ```bash
 brew tap snehmatic/mindloop
 brew install mindloop
+```
+
+**Run as a background service:**
+You can use Homebrew Services to run the Mindloop server in the background:
+```bash
+brew services start mindloop
 ```
 
 #### Option 2: Go Install

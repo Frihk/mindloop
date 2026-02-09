@@ -35,8 +35,17 @@ func Conn(connString string) (*gorm.DB, error) {
 	return db, nil
 }
 
+func GetLocalDBPath() string {
+	localFile := "mindloop_local.db"
+	if utils.FileExists(localFile) {
+		return localFile
+	}
+	return config.GetDataDir() + "/" + localFile
+}
+
 func LocalConn() (*gorm.DB, error) {
-	db, err := gorm.Open(sqlite.Open("mindloop_local.db"), &gorm.Config{
+	dbPath := GetLocalDBPath()
+	db, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,
 			NoLowerCase:   true,
@@ -51,7 +60,7 @@ func LocalConn() (*gorm.DB, error) {
 		return db, err
 	}
 
-	logger.Info().Msg("Connected to local SQLite DB, migrations complete!")
+	logger.Info().Msgf("Connected to local SQLite DB at %s, migrations complete!", dbPath)
 	return db, nil
 }
 
@@ -77,7 +86,7 @@ func ConnectToDb(appConfig config.Config) (*gorm.DB, error) {
 }
 
 func LocalDBFileExists() bool {
-	return utils.FileExists("mindloop_local.db")
+	return utils.FileExists(GetLocalDBPath())
 }
 
 func MigrateDB(db *gorm.DB) error {

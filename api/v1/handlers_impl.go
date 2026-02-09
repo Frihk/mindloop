@@ -737,7 +737,8 @@ func (mlh *MindloopHandler) HandleNoteDelete(w http.ResponseWriter, r *http.Requ
 }
 func (mlh *MindloopHandler) HandleAbout(w http.ResponseWriter, r *http.Request) {
 	mlh.renderTemplate(w, "about.html", map[string]interface{}{
-		"Title": "About",
+		"Title":   "About",
+		"Version": config.Version,
 	})
 }
 
