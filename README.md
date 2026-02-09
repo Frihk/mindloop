@@ -83,6 +83,8 @@ brew tap snehmatic/mindloop
 brew install mindloop
 ```
 
+> **Note:** If you are not seeing the latest version, run `brew update` to refresh the tap.
+
 **Run as a background service:**
 You can use Homebrew Services to run the Mindloop server in the background:
 ```bash
