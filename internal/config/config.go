@@ -13,9 +13,28 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// UserConfigPath is the file path where the user configuration YAML will be written.
-// ToDo: Make this configurable or use a constant
-var UserConfigPath = "user_config.yaml"
+func GetUserConfigPath() string {
+	localFile := "user_config.yaml"
+	if _, err := os.Stat(localFile); err == nil {
+		return localFile
+	}
+	return GetDataDir() + "/" + localFile
+}
+
+// Version is set during build time via ldflags
+var Version = "dev"
+
+func GetDataDir() string {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return "."
+	}
+	dir := homeDir + "/.mindloop"
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		_ = os.MkdirAll(dir, 0755)
+	}
+	return dir
+}
 
 type MindloopMode string
 
@@ -99,8 +118,9 @@ type FeatureFlags struct {
 func ValidateUserConfig(cmd *cobra.Command) {
 	// check if user_config.yaml exists
 	logger := log.Get()
-	if utils.FileExists(UserConfigPath) {
-		logger.Debug().Msgf("User config exists at %s", UserConfigPath)
+	configPath := GetUserConfigPath()
+	if utils.FileExists(configPath) {
+		logger.Debug().Msgf("User config exists at %s", configPath)
 	} else {
 		if cmd.Use != "configure" {
 			utils.PrintWarnln("Warn: user config does not exist, create a new one or run `mindloop configure`.")
@@ -116,7 +136,7 @@ func (uc UserConfig) WriteToYAML() {
 		utils.PrintErrorln("Error marshalling user config to YAML")
 		return
 	}
-	err = os.WriteFile(UserConfigPath, marshalled, 0644)
+	err = os.WriteFile(GetUserConfigPath(), marshalled, 0644)
 	if err != nil {
 		utils.PrintErrorln("Error writing user config to file")
 		return
@@ -125,7 +145,7 @@ func (uc UserConfig) WriteToYAML() {
 }
 
 func (uc *UserConfig) ReadFromYAML() error {
-	data, err := os.ReadFile(UserConfigPath)
+	data, err := os.ReadFile(GetUserConfigPath())
 	if err != nil {
 		return fmt.Errorf("failed to read user config file: %w", err)
 	}

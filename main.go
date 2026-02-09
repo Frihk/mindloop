@@ -14,14 +14,18 @@ const (
 )
 
 func main() {
-	logFile, err := os.OpenFile("mindloop.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	logPath := "mindloop.log"
+	if _, err := os.Stat(logPath); os.IsNotExist(err) {
+		logPath = config.GetDataDir() + "/mindloop.log"
+	}
+	logFile, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		panic("Failed to open log file: " + err.Error())
 	}
 	defer logFile.Close()
 	log.Init(logFile, zerolog.DebugLevel)
 	logger := log.Get()
-	logger.Info().Msg("Logging to mindloop.log file...")
+	logger.Info().Msgf("Logging to %s file...", logPath)
 
 	// Init global config
 	config.InitConfig(AppName, "local", "")
