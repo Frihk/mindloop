@@ -24,6 +24,51 @@ import (
 	"github.com/snehmatic/mindloop/web"
 )
 
+type HabitView struct {
+	models.Habit
+	ActualCount int
+	ProgressPct int
+	Streak      int
+}
+
+var templateFuncs = template.FuncMap{
+	"json": func(v interface{}) template.JS {
+		a, _ := json.Marshal(v)
+		return template.JS(a)
+	},
+	"title": func(v any) string {
+		s := fmt.Sprint(v)
+		if len(s) == 0 {
+			return ""
+		}
+		return strings.ToUpper(s[:1]) + strings.ToLower(s[1:])
+	},
+	"iso8601": func(t time.Time) string {
+		return t.Format(time.RFC3339)
+	},
+	"split": func(s, sep string) []string {
+		if s == "" {
+			return nil
+		}
+		parts := strings.Split(s, sep)
+		var trimmed []string
+		for _, p := range parts {
+			t := strings.TrimSpace(p)
+			if t != "" {
+				trimmed = append(trimmed, t)
+			}
+		}
+		return trimmed
+	},
+	"asset": func(path string) string {
+		cfg := config.GetConfig()
+		if cfg.Mode == config.Local {
+			return fmt.Sprintf("%s?v=%d", path, time.Now().Unix())
+		}
+		return fmt.Sprintf("%s?v=1.0.0", path)
+	},
+}
+
 type MindloopHandler struct {
 	config  *config.Config
 	journal *journal.Service
@@ -65,43 +110,15 @@ func (mlh *MindloopHandler) renderTemplate(w http.ResponseWriter, tmpl string, d
 		"templates/" + tmpl,
 	}
 
-	ts := template.New("layout.html").Funcs(template.FuncMap{
-		"json": func(v interface{}) template.JS {
-			a, _ := json.Marshal(v)
-			return template.JS(a)
-		},
-		"title": func(v any) string {
-			s := fmt.Sprint(v)
-			if len(s) == 0 {
-				return ""
-			}
-			return strings.ToUpper(s[:1]) + strings.ToLower(s[1:])
-		},
-		"iso8601": func(t time.Time) string {
-			return t.Format(time.RFC3339)
-		},
-		"split": func(s, sep string) []string {
-			if s == "" {
-				return nil
-			}
-			parts := strings.Split(s, sep)
-			var trimmed []string
-			for _, p := range parts {
-				t := strings.TrimSpace(p)
-				if t != "" {
-					trimmed = append(trimmed, t)
-				}
-			}
-			return trimmed
-		},
-		"asset": func(path string) string {
-			cfg := config.GetConfig()
-			if cfg.Mode == config.Local {
-				return fmt.Sprintf("%s?v=%d", path, time.Now().Unix())
-			}
-			return fmt.Sprintf("%s?v=1.0.0", path)
-		},
-	})
+	// Also include partials that might be used by the main template
+	if tmpl == "focus.html" {
+		files = append(files, "templates/focus_active_timer.html", "templates/focus_session_list.html")
+	}
+	if tmpl == "habits.html" {
+		files = append(files, "templates/_habit_card.html")
+	}
+
+	ts := template.New("layout.html").Funcs(templateFuncs)
 
 	ts, err := ts.ParseFS(web.WebFS, files...)
 	if err != nil {
@@ -122,6 +139,32 @@ func (mlh *MindloopHandler) renderTemplate(w http.ResponseWriter, tmpl string, d
 	err = ts.Execute(&buf, data)
 	if err != nil {
 		log.Error().Err(err).Msg("Error executing template")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	_, _ = fmt.Fprint(w, buf.String())
+}
+
+func (mlh *MindloopHandler) renderPartial(w http.ResponseWriter, tmpl string, data interface{}) {
+	files := []string{
+		"templates/" + tmpl,
+	}
+
+	// We use the filename as the template name for single file parsing
+	ts := template.New(tmpl).Funcs(templateFuncs)
+
+	ts, err := ts.ParseFS(web.WebFS, files...)
+	if err != nil {
+		log.Error().Err(err).Msg("Error parsing partial template")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	var buf strings.Builder
+	err = ts.Execute(&buf, data)
+	if err != nil {
+		log.Error().Err(err).Msg("Error executing partial template")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}

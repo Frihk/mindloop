@@ -69,13 +69,6 @@ func (mlh *MindloopHandler) HandleHabitList(w http.ResponseWriter, r *http.Reque
 	}
 
 	// Calculate completion for UI
-	type HabitView struct {
-		models.Habit
-		ActualCount int
-		ProgressPct int
-		Streak      int
-	}
-
 	var habitViews []HabitView
 	for _, h := range habits {
 		actual := 0
@@ -260,6 +253,59 @@ func (mlh *MindloopHandler) HandleHabitView(w http.ResponseWriter, r *http.Reque
 	})
 }
 
+func (mlh *MindloopHandler) getHabitView(id string) (*HabitView, error) {
+	h, err := mlh.habit.GetHabit(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Re-calculate view state
+	// We need the log for TODAY
+	// This is inefficient (fetching all logs) but consistent with ListHabitLogs usage
+	// A real app would have GetHabitLog(id, date)
+	logs, _ := mlh.habit.ListLogsForHabit(h.ID)
+	actual := 0
+	
+	// Find current log
+	now := time.Now()
+	for _, l := range logs {
+		isCurrent := false
+		if h.Interval == models.Daily {
+			if l.CreatedAt.Truncate(24*time.Hour).Equal(now.Truncate(24*time.Hour)) {
+				isCurrent = true
+			}
+		} else {
+			y1, w1 := l.CreatedAt.ISOWeek()
+			y2, w2 := now.ISOWeek()
+			if y1 == y2 && w1 == w2 {
+				isCurrent = true
+			}
+		}
+		
+		if isCurrent {
+			actual = l.ActualCount
+			break
+		}
+	}
+
+	pct := 0
+	if h.TargetCount > 0 {
+		pct = (actual * 100) / h.TargetCount
+	}
+	if pct > 100 {
+		pct = 100
+	}
+
+	streak, _ := mlh.habit.CalculateStreak(h.ID, h.Interval)
+
+	return &HabitView{
+		Habit:       *h,
+		ActualCount: actual,
+		ProgressPct: pct,
+		Streak:      streak,
+	}, nil
+}
+
 func (mlh *MindloopHandler) HandleHabitLog(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Redirect(w, r, "/habits", http.StatusSeeOther)
@@ -270,8 +316,21 @@ func (mlh *MindloopHandler) HandleHabitLog(w http.ResponseWriter, r *http.Reques
 	_, _, err := mlh.habit.LogHabit(habitID)
 	if err != nil {
 		log.Error().Err(err).Msg("Error logging habit")
+		if r.Header.Get("HX-Request") == "true" {
+			w.Header().Set("HX-Redirect", "/habits?error="+err.Error())
+			return
+		}
 		http.Redirect(w, r, "/habits?error="+err.Error(), http.StatusSeeOther)
 		return
+	}
+
+	if r.Header.Get("HX-Request") == "true" {
+		view, err := mlh.getHabitView(habitID)
+		if err == nil {
+			mlh.renderPartial(w, "_habit_card.html", view)
+			return
+		}
+		// Fallback if view fetch fails
 	}
 
 	http.Redirect(w, r, "/habits?success=true", http.StatusSeeOther)
@@ -287,9 +346,22 @@ func (mlh *MindloopHandler) HandleHabitUnlog(w http.ResponseWriter, r *http.Requ
 	_, err := mlh.habit.UnlogHabit(habitID)
 	if err != nil {
 		log.Error().Err(err).Msg("Error Unlogging habit")
+		if r.Header.Get("HX-Request") == "true" {
+			w.Header().Set("HX-Redirect", "/habits?error="+err.Error())
+			return
+		}
 		http.Redirect(w, r, "/habits?error="+err.Error(), http.StatusSeeOther)
 		return
 	}
+	
+	if r.Header.Get("HX-Request") == "true" {
+		view, err := mlh.getHabitView(habitID)
+		if err == nil {
+			mlh.renderPartial(w, "_habit_card.html", view)
+			return
+		}
+	}
+
 	http.Redirect(w, r, "/habits?success=true", http.StatusSeeOther)
 }
 
@@ -303,9 +375,19 @@ func (mlh *MindloopHandler) HandleHabitDelete(w http.ResponseWriter, r *http.Req
 	err := mlh.habit.DeleteHabit(habitID)
 	if err != nil {
 		log.Error().Err(err).Msg("Error deleting habit")
+		if r.Header.Get("HX-Request") == "true" {
+			w.Header().Set("HX-Redirect", "/habits?error="+err.Error())
+			return
+		}
 		http.Redirect(w, r, "/habits?error="+err.Error(), http.StatusSeeOther)
 		return
 	}
+
+	if r.Header.Get("HX-Request") == "true" {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
 	http.Redirect(w, r, "/habits?success=true", http.StatusSeeOther)
 }
 
@@ -424,9 +506,22 @@ func (mlh *MindloopHandler) HandleFocusStart(w http.ResponseWriter, r *http.Requ
 	_, err := mlh.focus.StartSession(title)
 	if err != nil {
 		log.Error().Err(err).Msg("Error starting focus session")
+		if r.Header.Get("HX-Request") == "true" {
+			w.Header().Set("HX-Redirect", "/focus?error="+err.Error())
+			return
+		}
 		http.Redirect(w, r, "/focus?error="+err.Error(), http.StatusSeeOther)
 		return
 	}
+
+	if r.Header.Get("HX-Request") == "true" {
+		sessions, _ := mlh.focus.ListSessions()
+		data := map[string]interface{}{"Sessions": sessions}
+		mlh.renderPartial(w, "focus_active_timer.html", data)
+		mlh.renderPartial(w, "focus_session_list.html", data)
+		return
+	}
+
 	http.Redirect(w, r, "/focus?success=true", http.StatusSeeOther)
 }
 
@@ -440,9 +535,22 @@ func (mlh *MindloopHandler) HandleFocusStop(w http.ResponseWriter, r *http.Reque
 	_, err := mlh.focus.EndSession(id)
 	if err != nil {
 		log.Error().Err(err).Msg("Error ending focus session")
+		if r.Header.Get("HX-Request") == "true" {
+			w.Header().Set("HX-Redirect", "/focus?error="+err.Error())
+			return
+		}
 		http.Redirect(w, r, "/focus?error="+err.Error(), http.StatusSeeOther)
 		return
 	}
+
+	if r.Header.Get("HX-Request") == "true" {
+		sessions, _ := mlh.focus.ListSessions()
+		data := map[string]interface{}{"Sessions": sessions}
+		mlh.renderPartial(w, "focus_active_timer.html", data)
+		mlh.renderPartial(w, "focus_session_list.html", data)
+		return
+	}
+
 	http.Redirect(w, r, "/focus?success=true", http.StatusSeeOther)
 }
 
@@ -455,9 +563,22 @@ func (mlh *MindloopHandler) HandleFocusDelete(w http.ResponseWriter, r *http.Req
 	id, _ := strconv.Atoi(idStr)
 	if err := mlh.focus.DeleteSession(id); err != nil {
 		log.Error().Err(err).Msg("Error deleting focus session")
+		if r.Header.Get("HX-Request") == "true" {
+			w.Header().Set("HX-Redirect", "/focus?error="+err.Error())
+			return
+		}
 		http.Redirect(w, r, "/focus?error="+err.Error(), http.StatusSeeOther)
 		return
 	}
+
+	if r.Header.Get("HX-Request") == "true" {
+		sessions, _ := mlh.focus.ListSessions()
+		data := map[string]interface{}{"Sessions": sessions}
+		mlh.renderPartial(w, "focus_active_timer.html", data)
+		mlh.renderPartial(w, "focus_session_list.html", data)
+		return
+	}
+
 	http.Redirect(w, r, "/focus?success=true", http.StatusSeeOther)
 }
 
@@ -474,6 +595,10 @@ func (mlh *MindloopHandler) HandleFocusUpdate(w http.ResponseWriter, r *http.Req
 	session, err := mlh.focus.GetSession(id)
 	if err != nil {
 		log.Error().Err(err).Msg("Error fetching focus session for update")
+		if r.Header.Get("HX-Request") == "true" {
+			w.Header().Set("HX-Redirect", "/focus?error=Session not found")
+			return
+		}
 		http.Redirect(w, r, "/focus?error=Session not found", http.StatusSeeOther)
 		return
 	}
@@ -482,7 +607,19 @@ func (mlh *MindloopHandler) HandleFocusUpdate(w http.ResponseWriter, r *http.Req
 
 	if err := mlh.focus.UpdateSession(session); err != nil {
 		log.Error().Err(err).Msg("Error updating focus session")
+		if r.Header.Get("HX-Request") == "true" {
+			w.Header().Set("HX-Redirect", "/focus?error=Failed to update session")
+			return
+		}
 		http.Redirect(w, r, "/focus?error=Failed to update session", http.StatusSeeOther)
+		return
+	}
+
+	if r.Header.Get("HX-Request") == "true" {
+		sessions, _ := mlh.focus.ListSessions()
+		data := map[string]interface{}{"Sessions": sessions}
+		mlh.renderPartial(w, "focus_active_timer.html", data)
+		mlh.renderPartial(w, "focus_session_list.html", data)
 		return
 	}
 

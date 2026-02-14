@@ -6,23 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ .Title }} - Mindloop</title>
     <link rel="icon" type="image/x-icon" href="/static/favicon_io/favicon.ico">
-    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon_io/favicon-16x16.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon_io/favicon-32x32.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/static/favicon_io/apple-touch-icon.png">
-    <link rel="manifest" href="/static/favicon_io/site.webmanifest">
     <link rel="stylesheet" href='{{ asset "/static/css/style.css" }}'>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="/static/js/lucide.min.js"></script>
     <script>
         // Check for saved user preference early to prevent flash
         (function () {
             const currentTheme = localStorage.getItem('theme');
             if (currentTheme) {
                 document.documentElement.classList.add(currentTheme);
-                if (currentTheme === 'dark-mode') {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                }
             }
         })();
     </script>
@@ -32,71 +27,135 @@
     <header>
         <div class="container">
             <nav>
-                <a href="/" class="logo" style="text-decoration: none;">
-                    <span
-                        style="background: var(--gradient-primary); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Mindloop</span>
+                <a href="/" class="logo">
+                    <i data-lucide="infinity"></i>
+                    Mindloop
                 </a>
                 <ul class="nav-links">
-                    <li><a href="/" class="nav-link">Home</a></li>
-                    <li><a href="/intent" class="nav-link">Intent</a></li>
-                    <li><a href="/habits" class="nav-link">Habits</a></li>
-                    <li><a href="/focus" class="nav-link">Focus</a></li>
-                    <li class="dropdown">
-                        <a href="#" class="nav-link">Write ▾</a>
+                    <li><a href="/" class="nav-link" title="Home"><i data-lucide="home"></i> <span
+                                class="nav-text">Home</span></a></li>
+                    <li><a href="/intent" class="nav-link" title="Intent"><i data-lucide="crosshair"></i> <span
+                                class="nav-text">Intent</span></a></li>
+                    <li><a href="/habits" class="nav-link" title="Habits"><i data-lucide="check-square"></i> <span
+                                class="nav-text">Habits</span></a></li>
+                    <li><a href="/focus" class="nav-link" title="Focus"><i data-lucide="zap"></i> <span
+                                class="nav-text">Focus</span></a></li>
+
+                    <!-- Write Dropdown -->
+                    <li class="dropdown" id="write-dropdown">
+                        <a href="#" class="nav-link" onclick="toggleWriteDropdown(event)" title="Write">
+                            <i data-lucide="pen-tool"></i> <span class="nav-text">Write</span> <i
+                                data-lucide="chevron-down" style="width: 0.8em; height: 0.8em; opacity: 0.7;"></i>
+                        </a>
                         <div class="dropdown-content">
-                            <a href="/journal" class="dropdown-item">Journal</a>
-                            <a href="/notes" class="dropdown-item">Notes</a>
+                            <a href="/journal" class="dropdown-item"><i data-lucide="book"></i> Journal</a>
+                            <a href="/notes" class="dropdown-item"><i data-lucide="file-text"></i> Notes</a>
                         </div>
                     </li>
-                    <li><a href="/summary" class="nav-link">Summary</a></li>
-                    <li><a href="/void" class="nav-link">The Void</a></li>
-                    <li><a href="/about" class="nav-link">About</a></li>
-                    <li><a href="/settings" class="nav-link">Settings</a></li>
-                    <li><button id="theme-toggle" class="btn btn-sm btn-secondary"
-                            style="padding: 0.4rem 0.6rem;">🌙</button></li>
+
+                    <li><a href="/summary" class="nav-link" title="Summary"><i data-lucide="bar-chart-2"></i> <span
+                                class="nav-text">Summary</span></a></li>
+                    <li><a href="/void" class="nav-link" title="The Void"><i data-lucide="ghost"></i> <span
+                                class="nav-text">Void</span></a></li>
+
+                    <!-- Icon-only items -->
+                    <li><a href="/about" class="nav-link" title="About"><i data-lucide="info"></i></a></li>
+                    <li><a href="/settings" class="nav-link" title="Settings"><i data-lucide="settings"></i></a></li>
+
+                    <li><button id="theme-toggle" class="btn btn-sm btn-secondary">
+                        <i data-lucide="moon" class="icon-moon" style="width: 1.1em; height: 1.1em;"></i>
+                        <i data-lucide="sun" class="icon-sun" style="width: 1.1em; height: 1.1em; display: none;"></i>
+                    </button>
+                    </li>
                 </ul>
             </nav>
         </div>
     </header>
     <main class="container">
         {{ if .SuccessMessage }}
-        <div class="card mb-md" style="border-left: 4px solid var(--success); background: #f0fdf4;">
-            <div style="color: #166534; font-weight: 500;">{{ .SuccessMessage }}</div>
+        <div class="card mb-md animate-fade-in"
+            style="background-color: var(--success-bg); border-color: var(--success); color: var(--success);">
+            <div style="font-weight: 500;">{{ .SuccessMessage }}</div>
         </div>
         {{ end }}
         {{ if .ErrorMessage }}
-        <div class="card mb-md" style="border-left: 4px solid var(--danger); background: #fef2f2;">
-            <div style="color: #991b1b; font-weight: 500;">{{ .ErrorMessage }}</div>
+        <div class="card mb-md animate-fade-in"
+            style="background-color: var(--danger-bg); border-color: var(--danger); color: var(--danger);">
+            <div style="font-weight: 500;">{{ .ErrorMessage }}</div>
         </div>
         {{ end }}
+
+        <!-- Placeholder for HTMX OOB Toasts -->
+        <div id="toast-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 100;"></div>
+
         {{ template "content" . }}
     </main>
 
-
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+
+            // Re-run icons on HTMX content swaps
+            document.body.addEventListener('htmx:afterSwap', function (evt) {
+                // We scan the whole body to be safe, as some swaps might replace containers
+                lucide.createIcons();
+            });
+
             const themeToggle = document.getElementById('theme-toggle');
             const html = document.documentElement;
-            const icon = themeToggle;
+            const moonIcon = document.querySelector('.icon-moon');
+            const sunIcon = document.querySelector('.icon-sun');
+
+            function updateIcons(isDark) {
+                // We need to re-query because lucide might have replaced <i> with <svg>
+                // But the class names should be preserved on the new SVGs
+                const moon = document.querySelector('.icon-moon');
+                const sun = document.querySelector('.icon-sun');
+                
+                if (isDark) {
+                    if(moon) moon.style.display = 'none';
+                    if(sun) sun.style.display = 'block';
+                } else {
+                    if(moon) moon.style.display = 'block';
+                    if(sun) sun.style.display = 'none';
+                }
+            }
 
             // Sync icon on load
             if (html.classList.contains('dark-mode')) {
-                icon.textContent = '☀️';
+                updateIcons(true);
+            } else {
+                updateIcons(false);
             }
 
             themeToggle.addEventListener('click', function () {
                 html.classList.toggle('dark-mode');
-                let theme = 'light';
-                if (html.classList.contains('dark-mode')) {
-                    theme = 'dark-mode';
+                let isDark = html.classList.contains('dark-mode');
+                
+                if (isDark) {
                     html.setAttribute('data-theme', 'dark');
-                    icon.textContent = '☀️';
+                    localStorage.setItem('theme', 'dark-mode');
                 } else {
                     html.removeAttribute('data-theme');
-                    icon.textContent = '🌙';
+                    localStorage.setItem('theme', 'light');
                 }
-                localStorage.setItem('theme', theme);
+                
+                updateIcons(isDark);
             });
+        });
+
+        function toggleWriteDropdown(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const d = document.getElementById('write-dropdown');
+            d.classList.toggle('active');
+        }
+
+        // Close dropdowns
+        window.addEventListener('click', function (e) {
+            if (!e.target.closest('#write-dropdown')) {
+                document.getElementById('write-dropdown').classList.remove('active');
+            }
         });
     </script>
 </body>
