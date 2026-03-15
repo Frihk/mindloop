@@ -29,6 +29,7 @@ Building a robust foundation for long-term maintainability.
 - [ ] **Containerization**: Official Docker image for easier deployment.
 
 ## ✅ Recently Completed
+- [x] **Gamification**: Comprehensive points system with customizable rewards, celebrations, and milestone tracking.
 - [x] **UI Polish**: Massive consistency update (Alignment, Icons, Spacing).
 - [x] **Visuals**: Dark Mode, Glassmorphism elements.
 - [x] **Features**: Side Quest Modal, Habit Heatmaps, stacked Settings.

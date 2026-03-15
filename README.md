@@ -36,6 +36,14 @@ High-level metrics and a bird's-eye view of your productivity data.
 - Review completed intents and habit consistency.
 - Filter data by date ranges.
 
+### Gamification & Points
+Turn your productivity into a game with a built-in reward system.
+- **Earn Points**: Get rewarded for completing focus sessions, habits, intents, journals, and side quests.
+- **Milestones**: Reach point milestones (every 100 pts) to trigger special celebration screens.
+- **Customizable Rewards**: Define your own point values for different activities in the Settings.
+- **Visual Progress**: Track your points over time with a dedicated chart in the Summary report.
+- **Celebrations**: Enjoy confetti animations when you finish tasks and reach new heights.
+
 ### Settings & Configuration
 - **Stacked Layout**: Clean, organized settings page with vertical stacking for better focus.
 - **Data Management**: Easy backup, restore, and reset options.

@@ -32,6 +32,13 @@ View a summary of your activities, including completed focus sessions, habits lo
 
 ![Summary](img/summary_final.png)
 
+## Gamification & Celebrations
+Mindloop rewards your productivity with points and celebrations.
+- **Points System**: Earn points for every activity completed.
+- **Customization**: Set your own point rewards in the Settings page.
+- **Confetti**: Celebrate small wins with instant confetti animations.
+- **Milestones**: Reach 100-point increments to unlock a special full-screen milestone celebration.
+
 ## Dark Mode
 Mindloop includes a built-in Dark Mode for comfortable viewing in low-light environments. Toggle it using the moon/sun icon in the navigation bar.
 
