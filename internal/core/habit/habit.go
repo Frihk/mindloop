@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/snehmatic/mindloop/internal/core/points"
 	"github.com/snehmatic/mindloop/models"
 	"gorm.io/gorm"
 )
@@ -79,10 +80,10 @@ func (s *Service) ListEndedHabits() ([]models.Habit, error) {
 	return habits, result.Error
 }
 
-func (s *Service) LogHabit(habitID string) (*models.Habit, *models.HabitLog, error) {
+func (s *Service) LogHabit(habitID string, pointsToAward int) (*models.Habit, *models.HabitLog, bool, error) {
 	habit, err := s.GetHabit(habitID)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, false, err
 	}
 
 	var existingLogs []models.HabitLog
@@ -105,20 +106,27 @@ func (s *Service) LogHabit(habitID string) (*models.Habit, *models.HabitLog, err
 
 	res := s.DB.Where("HabitID = ? AND CreatedAt >= ? AND CreatedAt < ?", habit.ID, startRange, endRange).Limit(1).Find(&existingLogs)
 	if res.Error != nil {
-		return nil, nil, res.Error
+		return nil, nil, false, res.Error
 	}
+
+	milestoneReached := false
 
 	if len(existingLogs) > 0 {
 		existingLog := existingLogs[0]
 		if existingLog.ActualCount >= habit.TargetCount {
-			return habit, &existingLog, errors.New("habit already completed for interval")
+			return habit, &existingLog, false, errors.New("habit already completed for interval")
 		}
 
 		existingLog.ActualCount++
 		if err := s.DB.Save(&existingLog).Error; err != nil {
-			return nil, nil, err
+			return nil, nil, false, err
 		}
-		return habit, &existingLog, nil
+
+		if existingLog.ActualCount == habit.TargetCount {
+			milestoneReached, _ = points.AwardPoints(s.DB, models.CategoryHabit, habit.ID, pointsToAward)
+		}
+
+		return habit, &existingLog, milestoneReached, nil
 	}
 
 	// Create new log
@@ -131,10 +139,14 @@ func (s *Service) LogHabit(habitID string) (*models.Habit, *models.HabitLog, err
 		EndedAt:     endRange.AddDate(0, 0, -1), // Represents the last day of the interval
 	}
 	if err := s.DB.Create(habitLog).Error; err != nil {
-		return nil, nil, err
+		return nil, nil, false, err
 	}
 
-	return habit, habitLog, nil
+	if habitLog.ActualCount == habit.TargetCount {
+		milestoneReached, _ = points.AwardPoints(s.DB, models.CategoryHabit, habit.ID, pointsToAward)
+	}
+
+	return habit, habitLog, milestoneReached, nil
 }
 
 func (s *Service) UnlogHabit(habitID string) (*models.Habit, error) {

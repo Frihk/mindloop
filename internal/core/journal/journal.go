@@ -3,6 +3,7 @@ package journal
 import (
 	"errors"
 
+	"github.com/snehmatic/mindloop/internal/core/points"
 	"github.com/snehmatic/mindloop/models"
 	"gorm.io/gorm"
 )
@@ -15,12 +16,12 @@ func NewService(db *gorm.DB) *Service {
 	return &Service{DB: db}
 }
 
-func (s *Service) CreateEntry(title, content, mood string) error {
+func (s *Service) CreateEntry(title, content, mood string, pointsToAward int) (bool, error) {
 	if title == "" {
-		return errors.New("title cannot be empty")
+		return false, errors.New("title cannot be empty")
 	}
 	if content == "" {
-		return errors.New("content cannot be empty")
+		return false, errors.New("content cannot be empty")
 	}
 	if mood == "" {
 		mood = "neutral"
@@ -32,7 +33,12 @@ func (s *Service) CreateEntry(title, content, mood string) error {
 		Mood:    mood,
 	}
 
-	return s.DB.Create(&entry).Error
+	err := s.DB.Create(&entry).Error
+	milestoneReached := false
+	if err == nil {
+		milestoneReached, _ = points.AwardPoints(s.DB, models.CategoryJournal, entry.ID, pointsToAward)
+	}
+	return milestoneReached, err
 }
 
 func (s *Service) ListEntries() ([]models.JournalEntry, error) {

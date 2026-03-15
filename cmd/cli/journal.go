@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 
+	cfg "github.com/snehmatic/mindloop/internal/config"
 	"github.com/snehmatic/mindloop/internal/core/journal"
 	"github.com/snehmatic/mindloop/internal/utils"
 	"github.com/snehmatic/mindloop/models"
@@ -48,7 +49,9 @@ var journalNewCmd = &cobra.Command{
 
 		utils.PrintInfoln("Saving your journal entry...")
 		// Mood handling is now done in the service if empty, but we pass the flag value
-		err = journalService.CreateEntry(args[0], content, *mood)
+		uc := cfg.UserConfig{}
+		_ = uc.ReadFromYAML()
+		milestoneReached, err := journalService.CreateEntry(args[0], content, *mood, uc.PointsConfig.Journal)
 		if err != nil {
 			utils.PrintErrorln("Failed to save journal:", err)
 			return
@@ -56,7 +59,10 @@ var journalNewCmd = &cobra.Command{
 
 		ac.Logger.Info().Msgf("Journal entry '%s' saved with mood '%s'.", args[0], *mood)
 		utils.PrintInfoln("Your journal entry has been saved successfully!")
-		utils.PrintSuccessln("Journal entry saved.")
+		utils.PrintSuccessf("Journal entry saved. (+%d pts) 🎉\n", uc.PointsConfig.Journal)
+		if milestoneReached {
+			utils.PrintRocketln("🏆 MILESTONE REACHED! You're on fire! 🏆")
+		}
 	},
 }
 

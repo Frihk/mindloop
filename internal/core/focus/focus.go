@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/snehmatic/mindloop/internal/core/points"
 	"github.com/snehmatic/mindloop/models"
 	"gorm.io/gorm"
 )
@@ -58,14 +59,14 @@ func (s *Service) UpdateSession(session *models.FocusSession) error {
 	return s.DB.Save(session).Error
 }
 
-func (s *Service) EndSession(id int) (*models.FocusSession, error) {
+func (s *Service) EndSession(id int, pointsToAward int) (*models.FocusSession, bool, error) {
 	var session models.FocusSession
 	if err := s.DB.First(&session, id).Error; err != nil {
-		return nil, err
+		return nil, false, err
 	}
 
 	if session.Status != "active" {
-		return nil, errors.New("focus session is not active")
+		return nil, false, errors.New("focus session is not active")
 	}
 
 	session.Status = "ended"
@@ -73,10 +74,12 @@ func (s *Service) EndSession(id int) (*models.FocusSession, error) {
 	session.Duration = session.EndTime.Sub(session.CreatedAt).Minutes()
 
 	if err := s.DB.Save(&session).Error; err != nil {
-		return nil, err
+		return nil, false, err
 	}
 
-	return &session, nil
+	milestoneReached, _ := points.AwardPoints(s.DB, models.CategoryFocus, session.ID, pointsToAward)
+
+	return &session, milestoneReached, nil
 }
 
 func (s *Service) RateSession(id int, rating int) (*models.FocusSession, error) {

@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"strings"
 
+	cfg "github.com/snehmatic/mindloop/internal/config"
 	"github.com/snehmatic/mindloop/internal/core/focus"
 	"github.com/snehmatic/mindloop/internal/core/intent"
 	"github.com/snehmatic/mindloop/internal/core/quest"
@@ -104,16 +105,22 @@ var questStopCmd = &cobra.Command{
 		}
 
 		if note == "" {
-			utils.PrintWarnln("No note provided. Saving with empty note.")
+			utils.PrintInfoln("No note provided. Saving with empty note.")
 		}
 
-		q, err = questService.StopQuest(q.ID, note)
+		uc := cfg.UserConfig{}
+		_ = uc.ReadFromYAML()
+
+		q, milestoneReached, err := questService.StopQuest(q.ID, note, uc.PointsConfig.Quest)
 		if err != nil {
 			utils.PrintErrorln("Error stopping quest:", err)
 			return
 		}
 
-		utils.PrintSuccessf("Side Quest '%s' complete!\n", q.Title)
+		utils.PrintSuccessf("Side Quest '%s' complete! (+%d pts) 🎉\n", q.Title, uc.PointsConfig.Quest)
+		if milestoneReached {
+			utils.PrintRocketln("🏆 MILESTONE REACHED! You're on fire! 🏆")
+		}
 		utils.PrintInfoln("Don't forget to resume your main intent/focus if needed.")
 	},
 }
@@ -142,8 +149,8 @@ var questDeleteCmd = &cobra.Command{
 }
 
 var questListCmd = &cobra.Command{
-	Use:     "list",
-	Short:   "List all side quests",
+	Use:   "list",
+	Short: "List all side quests",
 	Run: func(cmd *cobra.Command, args []string) {
 		quests, err := questService.ListQuests()
 		if err != nil {

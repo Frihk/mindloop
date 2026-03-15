@@ -3,9 +3,9 @@ package intent_test
 import (
 	"testing"
 
+	"github.com/glebarez/sqlite"
 	"github.com/snehmatic/mindloop/internal/core/intent"
 	"github.com/snehmatic/mindloop/models"
-	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 )
@@ -21,7 +21,7 @@ func setupTestDB(t *testing.T) *gorm.DB {
 		t.Fatalf("Failed to connect to test db: %v", err)
 	}
 
-	err = db.AutoMigrate(&models.Intent{})
+	err = db.AutoMigrate(&models.Intent{}, &models.PointTransaction{})
 	if err != nil {
 		t.Fatalf("Failed to migrate test db: %v", err)
 	}
@@ -53,7 +53,7 @@ func TestIntentService(t *testing.T) {
 
 	// 3. End Intent
 	id := "1"
-	ended, err := s.EndIntent(id)
+	ended, _, err := s.EndIntent(id, 10)
 	if err != nil {
 		t.Fatalf("Failed to end intent: %v", err)
 	}

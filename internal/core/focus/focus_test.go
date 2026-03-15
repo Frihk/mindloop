@@ -3,9 +3,9 @@ package focus_test
 import (
 	"testing"
 
+	"github.com/glebarez/sqlite"
 	"github.com/snehmatic/mindloop/internal/core/focus"
 	"github.com/snehmatic/mindloop/models"
-	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 )
@@ -21,7 +21,7 @@ func setupTestDB(t *testing.T) *gorm.DB {
 		t.Fatalf("Failed to connect to test db: %v", err)
 	}
 
-	err = db.AutoMigrate(&models.FocusSession{})
+	err = db.AutoMigrate(&models.FocusSession{}, &models.PointTransaction{})
 	if err != nil {
 		t.Fatalf("Failed to migrate test db: %v", err)
 	}
@@ -82,7 +82,7 @@ func TestEndAndRestartSession(t *testing.T) {
 	}
 
 	// 2. End session
-	_, err = s.EndSession(int(sess.ID))
+	_, _, err = s.EndSession(int(sess.ID), 10)
 	if err != nil {
 		t.Fatalf("Failed to end session: %v", err)
 	}

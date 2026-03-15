@@ -226,10 +226,22 @@ func (mlh *MindloopHandler) HandleJournalList(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	mlh.renderTemplate(w, "journal.html", map[string]interface{}{
+	data := map[string]interface{}{
 		"Title":   "Journal",
 		"Entries": entries,
-	})
+	}
+
+	if success := r.URL.Query().Get("success"); success != "" {
+		if success == "true" {
+			data["SuccessMessage"] = "Action completed successfully"
+		} else if success == "done" {
+			data["SuccessMessage"] = "Journal entry saved! Great reflection!"
+		} else if success == "milestone" {
+			data["SuccessMessage"] = "🏆 MILESTONE REACHED! You are amazing! 🏆"
+		}
+	}
+
+	mlh.renderTemplate(w, "journal.html", data)
 }
 
 func (mlh *MindloopHandler) HandleJournalCreate(w http.ResponseWriter, r *http.Request) {
@@ -242,9 +254,30 @@ func (mlh *MindloopHandler) HandleJournalCreate(w http.ResponseWriter, r *http.R
 	content := r.FormValue("content")
 	mood := r.FormValue("mood")
 
-	if err := mlh.journal.CreateEntry(title, content, mood); err != nil {
+	uc := config.UserConfig{}
+	_ = uc.ReadFromYAML()
+
+	milestoneReached, err := mlh.journal.CreateEntry(title, content, mood, uc.PointsConfig.Journal)
+	if err != nil {
 		log.Error().Err(err).Msg("Error creating journal entry")
 		// In a real app, we'd pass the error back to the template
+	}
+
+	if uc.FeatureFlags.Gamification {
+		if r.Header.Get("HX-Request") == "true" {
+			if milestoneReached {
+				w.Header().Set("HX-Trigger", "{\"milestone\": {}}")
+			} else {
+				w.Header().Set("HX-Trigger", "{\"confetti\": {}}")
+			}
+		} else {
+			successType := "done"
+			if milestoneReached {
+				successType = "milestone"
+			}
+			http.Redirect(w, r, "/journal?success="+successType, http.StatusSeeOther)
+			return
+		}
 	}
 
 	http.Redirect(w, r, "/journal", http.StatusSeeOther)
@@ -292,12 +325,32 @@ func (mlh *MindloopHandler) HandleQuestStop(w http.ResponseWriter, r *http.Reque
 	id, _ := strconv.ParseUint(idStr, 10, 32)
 	note := r.FormValue("note")
 
-	_, _ = mlh.quest.StopQuest(uint(id), note)
+	uc := config.UserConfig{}
+	_ = uc.ReadFromYAML()
+
+	_, milestoneReached, _ := mlh.quest.StopQuest(uint(id), note, uc.PointsConfig.Quest)
 
 	// Auto-resume intent if one is paused
 	currentIntent, _ := mlh.intent.GetOngoingIntent()
 	if currentIntent != nil && currentIntent.Status == "paused" {
 		_, _ = mlh.intent.ResumeIntent(currentIntent.ID)
+	}
+
+	if uc.FeatureFlags.Gamification {
+		if r.Header.Get("HX-Request") == "true" {
+			if milestoneReached {
+				w.Header().Set("HX-Trigger", "{\"milestone\": {}}")
+			} else {
+				w.Header().Set("HX-Trigger", "{\"confetti\": {}}")
+			}
+		} else {
+			successType := "done"
+			if milestoneReached {
+				successType = "milestone"
+			}
+			http.Redirect(w, r, "/intent?success="+successType, http.StatusSeeOther)
+			return
+		}
 	}
 
 	http.Redirect(w, r, "/intent", http.StatusSeeOther)
@@ -332,7 +385,9 @@ func (mlh *MindloopHandler) HandleIntentResume(w http.ResponseWriter, r *http.Re
 	// 2. Automatically complete any active side quest
 	activeQuest, _ := mlh.quest.GetActiveQuest()
 	if activeQuest != nil {
-		_, _ = mlh.quest.StopQuest(activeQuest.ID, "Resumed main intent")
+		uc := config.UserConfig{}
+		_ = uc.ReadFromYAML()
+		_, _, _ = mlh.quest.StopQuest(activeQuest.ID, "Resumed main intent", uc.PointsConfig.Quest)
 	}
 
 	http.Redirect(w, r, "/intent", http.StatusSeeOther)

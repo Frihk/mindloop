@@ -6,12 +6,12 @@ import (
 	"os"
 	"strconv"
 
+	cfg "github.com/snehmatic/mindloop/internal/config"
 	"github.com/snehmatic/mindloop/internal/core/habit"
 	"github.com/snehmatic/mindloop/internal/utils"
 	"github.com/snehmatic/mindloop/models"
 	"github.com/spf13/cobra"
 )
-
 var (
 	daily        *bool
 	weekly       *bool
@@ -217,7 +217,10 @@ var habitLogCmd = &cobra.Command{
 		}
 		habitID := args[0]
 
-		habit, log, err := habitService.LogHabit(habitID)
+		uc := cfg.UserConfig{}
+		_ = uc.ReadFromYAML()
+
+		habit, log, milestoneReached, err := habitService.LogHabit(habitID, uc.PointsConfig.Habit)
 		if err != nil {
 			if err.Error() == "habit already completed for interval" {
 				utils.PrintRocketf("Habit already completed. No need to log again.\n")
@@ -233,7 +236,15 @@ var habitLogCmd = &cobra.Command{
 			Msgf("Habit %s logged %d/%d times in %s interval", habit.Title, log.ActualCount, habit.TargetCount, habit.Interval)
 		utils.PrintLoadingf("Habit %s logged %d/%d times in %s interval.\n", habit.Title, log.ActualCount, habit.TargetCount, habit.Interval)
 		utils.PrintInfof("Use 'mindloop habit unlog <id>' to mark it as undone, and reset to 0/%d.\n", habit.TargetCount)
-		utils.PrintSuccessf("Habit '%s' logged successfully.\n", habit.Title)
+
+		if log.ActualCount == habit.TargetCount {
+			utils.PrintSuccessf("Habit '%s' marked done! (+%d pts) 🎉\n", habit.Title, uc.PointsConfig.Habit)
+			if milestoneReached {
+				utils.PrintRocketln("🏆 MILESTONE REACHED! You're on fire! 🏆")
+			}
+		} else {
+			utils.PrintSuccessf("Habit '%s' logged successfully.\n", habit.Title)
+		}
 	},
 }
 
