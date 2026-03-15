@@ -12,6 +12,7 @@ import (
 	"github.com/snehmatic/mindloop/models"
 	"github.com/spf13/cobra"
 )
+
 var (
 	daily        *bool
 	weekly       *bool

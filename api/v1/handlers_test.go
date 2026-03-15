@@ -46,6 +46,7 @@ func setupTestServer(t *testing.T) *v1.MindloopHandler {
 		&models.FocusSession{},
 		&models.Intent{},
 		&models.SideQuest{},
+		&models.PointTransaction{},
 	)
 	if err != nil {
 		t.Fatalf("Failed to migrate test db: %v", err)
@@ -121,7 +122,7 @@ func TestHabitFlow(t *testing.T) {
 
 	resp = w.Result()
 	loc, _ = resp.Location()
-	if !strings.Contains(loc.String(), "success=true") {
+	if !strings.Contains(loc.String(), "success=done") {
 		t.Errorf("Log Habit failed/redirected wrong: %v", loc)
 	}
 

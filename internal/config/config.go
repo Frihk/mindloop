@@ -116,55 +116,57 @@ func GetConfig() *Config {
 }
 
 type UserConfig struct {
-        Name         string       `yaml:"name"`
-        Mode         string       `yaml:"mode"`
-        DbConfig     DBConfig     `yaml:"db_config"`
-        FeatureFlags FeatureFlags `yaml:"feature_flags"`
-        PointsConfig PointsConfig `yaml:"points_config"`
+	Name         string       `yaml:"name"`
+	Mode         string       `yaml:"mode"`
+	DbConfig     DBConfig     `yaml:"db_config"`
+	FeatureFlags FeatureFlags `yaml:"feature_flags"`
+	PointsConfig PointsConfig `yaml:"points_config"`
 }
 
 type FeatureFlags struct {
-        FocusCloud   bool `yaml:"focus_cloud"`
-        HabitCloud   bool `yaml:"habit_cloud"`
-        IntentCloud  bool `yaml:"intent_cloud"`
-        JournalCloud bool `yaml:"journal_cloud"`
-        NoteCloud    bool `yaml:"note_cloud"`
-        Gamification bool `yaml:"gamification"`
+	FocusCloud   bool `yaml:"focus_cloud"`
+	HabitCloud   bool `yaml:"habit_cloud"`
+	IntentCloud  bool `yaml:"intent_cloud"`
+	JournalCloud bool `yaml:"journal_cloud"`
+	NoteCloud    bool `yaml:"note_cloud"`
+	// Gamification toggles the points and celebration system
+	Gamification bool `yaml:"gamification"`
 }
 
+// PointsConfig stores the user-defined point values for each activity type
 type PointsConfig struct {
-        Focus   int `yaml:"focus"`
-        Habit   int `yaml:"habit"`
-        Intent  int `yaml:"intent"`
-        Journal int `yaml:"journal"`
-        Quest   int `yaml:"quest"`
+	Focus   int `yaml:"focus"`
+	Habit   int `yaml:"habit"`
+	Intent  int `yaml:"intent"`
+	Journal int `yaml:"journal"`
+	Quest   int `yaml:"quest"`
 }
 
 func (uc *UserConfig) SetDefaults() {
-        // Feature flags defaults
-        // Note: in YAML, a missing bool is false. 
-        // If we want it true by default, we'd need a more complex check or just assume if file is missing.
-        // For now, let's just force it to true if the config is newly initialized or missing the key.
-        // Actually, if we just want it 'default enabled' for new users:
-        if !uc.FeatureFlags.Gamification && uc.PointsConfig.Focus == 0 {
-             uc.FeatureFlags.Gamification = true
-        }
+	// Feature flags defaults
+	// Note: in YAML, a missing bool is false.
+	// If we want it true by default, we'd need a more complex check or just assume if file is missing.
+	// For now, let's just force it to true if the config is newly initialized or missing the key.
+	// Actually, if we just want it 'default enabled' for new users:
+	if !uc.FeatureFlags.Gamification && uc.PointsConfig.Focus == 0 {
+		uc.FeatureFlags.Gamification = true
+	}
 
-        if uc.PointsConfig.Focus == 0 {
-                uc.PointsConfig.Focus = 10
-        }
-        if uc.PointsConfig.Habit == 0 {
-                uc.PointsConfig.Habit = 5
-        }
-        if uc.PointsConfig.Intent == 0 {
-                uc.PointsConfig.Intent = 10
-        }
-        if uc.PointsConfig.Journal == 0 {
-                uc.PointsConfig.Journal = 5
-        }
-        if uc.PointsConfig.Quest == 0 {
-                uc.PointsConfig.Quest = 5
-        }
+	if uc.PointsConfig.Focus == 0 {
+		uc.PointsConfig.Focus = 10
+	}
+	if uc.PointsConfig.Habit == 0 {
+		uc.PointsConfig.Habit = 5
+	}
+	if uc.PointsConfig.Intent == 0 {
+		uc.PointsConfig.Intent = 10
+	}
+	if uc.PointsConfig.Journal == 0 {
+		uc.PointsConfig.Journal = 5
+	}
+	if uc.PointsConfig.Quest == 0 {
+		uc.PointsConfig.Quest = 5
+	}
 }
 
 func ValidateUserConfig(cmd *cobra.Command) {
@@ -197,15 +199,15 @@ func (uc UserConfig) WriteToYAML() {
 }
 
 func (uc *UserConfig) ReadFromYAML() error {
-        data, err := os.ReadFile(GetUserConfigPath())
-        if err != nil {
-                uc.SetDefaults() // Set defaults even if file doesn't exist
-                return fmt.Errorf("failed to read user config file: %w", err)
-        }
-        err = yaml.Unmarshal(data, uc)
-        if err != nil {
-                return fmt.Errorf("failed to unmarshal user config: %w", err)
-        }
-        uc.SetDefaults() // Ensure defaults for missing fields
-        return nil
+	data, err := os.ReadFile(GetUserConfigPath())
+	if err != nil {
+		uc.SetDefaults() // Set defaults even if file doesn't exist
+		return fmt.Errorf("failed to read user config file: %w", err)
+	}
+	err = yaml.Unmarshal(data, uc)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal user config: %w", err)
+	}
+	uc.SetDefaults() // Ensure defaults for missing fields
+	return nil
 }

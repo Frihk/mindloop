@@ -9,6 +9,7 @@ import (
 	"github.com/snehmatic/mindloop/models"
 	"github.com/spf13/cobra"
 )
+
 var (
 	focusService *focus.Service
 )
@@ -86,8 +87,8 @@ var focusEndCmd = &cobra.Command{
 			return
 		}
 
-				uc := cfg.UserConfig{}
-				_ = uc.ReadFromYAML()
+		uc := cfg.UserConfig{}
+		_ = uc.ReadFromYAML()
 		session, milestoneReached, err := focusService.EndSession(sessionIDInt, uc.PointsConfig.Focus)
 		if err != nil {
 			utils.PrintErrorln("Error ending focus session:", err)

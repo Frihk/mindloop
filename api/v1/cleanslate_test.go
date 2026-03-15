@@ -35,6 +35,7 @@ func setupCleanSlateTest(t *testing.T) (*MindloopHandler, *gorm.DB) {
 		&models.Intent{},
 		&models.Note{},
 		&models.SideQuest{},
+		&models.PointTransaction{},
 	)
 	if err != nil {
 		t.Fatalf("Failed to migrate: %v", err)

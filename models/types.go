@@ -322,16 +322,23 @@ func ToSideQuestView(sq SideQuest) SideQuestView {
 	}
 }
 
+// PointCategory represents the type of activity that earned points
 type PointCategory string
 
 const (
-	CategoryFocus   PointCategory = "focus"
-	CategoryHabit   PointCategory = "habit"
-	CategoryIntent  PointCategory = "intent"
+	// CategoryFocus for focus sessions
+	CategoryFocus PointCategory = "focus"
+	// CategoryHabit for habit completions
+	CategoryHabit PointCategory = "habit"
+	// CategoryIntent for intent completions
+	CategoryIntent PointCategory = "intent"
+	// CategoryJournal for journal entries
 	CategoryJournal PointCategory = "journal"
-	CategoryQuest   PointCategory = "quest"
+	// CategoryQuest for side quest completions
+	CategoryQuest PointCategory = "quest"
 )
 
+// PointTransaction records points earned for a specific activity
 type PointTransaction struct {
 	gorm.Model
 	ActivityType PointCategory `gorm:"type:varchar(50);not null" json:"activity_type"`
@@ -339,6 +346,7 @@ type PointTransaction struct {
 	Points       int           `gorm:"not null" json:"points"`
 }
 
+// PointStats aggregates point information for reporting
 type PointStats struct {
 	TotalPoints int
 	History     []PointTransaction

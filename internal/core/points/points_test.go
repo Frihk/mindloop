@@ -85,7 +85,7 @@ func TestGetPointsInRange(t *testing.T) {
 	db := setupTestDB(t)
 
 	now := time.Now()
-	
+
 	// Transaction 1 (Yesterday)
 	tx1 := models.PointTransaction{
 		ActivityType: models.CategoryHabit,
