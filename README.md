@@ -7,76 +7,6 @@
 
 **Mindloop** is a comprehensive productivity suite designed for local-first workflow management. It operates as a **CLI tool**, a **local API**, and a **UI**, utilizing a local SQLite database with BYODB (Bring Your Own Database) support.
 
-## Features
-
-### Intents
-Set a single-threaded goal to maintain absolute focus. **One thing at a time.**
-- Track lifecycle of your intents (Active, Completed, Failed).
-- **Side Quest Modal**: Manage ad-hoc tasks that interrupt your flow without losing context.
-
-### Focus Sessions
-Break your intents into deep work chunks with a built-in timer.
-- Track duration and frequency of deep work.
-- Associate sessions directly with your active Intent.
-
-### Habits
-Track daily and weekly habits to build consistency.
-- **Activity Heatmap**: Visualize your consistency with a GitHub-style activity grid.
-- Simple check-in system with streak tracking.
-
-### Journal
-A dedicated space for reflections, end-of-day closure, or gratitude logging.
-- **Mood Tracking**: Log your daily mood with a clean, consistent UI.
-- Markdown support for rich text entries.
-- "Close the loop" at the end of your workday.
-
-### Summary
-High-level metrics and a bird's-eye view of your productivity data.
-- Visualize time spent in focus.
-- Review completed intents and habit consistency.
-- Filter data by date ranges.
-
-### Gamification & Points
-Turn your productivity into a game with a built-in reward system.
-- **Earn Points**: Get rewarded for completing focus sessions, habits, intents, journals, and side quests.
-- **Milestones**: Reach point milestones (every 100 pts) to trigger special celebration screens.
-- **Customizable Rewards**: Define your own point values for different activities in the Settings.
-- **Visual Progress**: Track your points over time with a dedicated chart in the Summary report.
-- **Celebrations**: Enjoy confetti animations when you finish tasks and reach new heights.
-
-### Settings & Configuration
-- **Stacked Layout**: Clean, organized settings page with vertical stacking for better focus.
-- **Data Management**: Easy backup, restore, and reset options.
-- **BYODB**: Bring Your Own Database (PostgreSQL) support.
-
-> **Note:** For a visual tour of the interface and responsive design, checking out the [Web UI Documentation](docs/web_ui.md).
-
-## Architecture
-
-Mindloop follows a clean architecture pattern, separating core business logic from interfaces and data storage.
-
-*   **Core Services (Business Logic):**
-    Located in `internal/core`, this layer isolates the rules for each domain:
-    *   `intent`: Manages single-threaded work goals and lifecycles.
-    *   `quest`: Handles ad-hoc "side quests" that shadow main intents.
-    *   `focus`: Handles deep work session timers and tracking.
-    *   `habit`: Logic for daily/weekly habit tracking and streaks.
-    *   `journal`: Manages daily reflections and mood logging.
-    *   `summary`: Aggregates data for productivity reporting.
-
-*   **Interfaces (Presentation Layer):**
-    *   **CLI (`cmd/cli`):** Built with [Cobra](https://github.com/spf13/cobra), this interface interacts directly with the local database for low-latency command-line usage. Use `mindloop --version` to check your current version. Check out the [CLI Usage Guide](docs/CLI_USAGE.md) for detailed command instructions.
-    *   **Web Server (`cmd/server`):** A Go HTTP server exposing a REST API (`api/v1`).
-    *   **Web UI:** Server-Side Rendered (SSR) HTML templates (`web/templates`) utilizing vanilla CSS/JS. "Vibe coded" with Gemini (backend-focused developer approach).
-
-*   **Data Layer:**
-    *   Uses [GORM](https://gorm.io/) for ORM capabilities.
-    *   **Default:** Zero-config SQLite (`mindloop_local.db`).
-    *   **Universal Storage:** By default, data is stored in `~/.mindloop/` to ensure persistence across different working directories. It also checks for a local `mindloop_local.db` in the current directory for project-specific overrides.
-    *   **Optional:** Supports PostgreSQL via configuration (BYODB mode).
-
----
-
 ## Getting Started
 
 ### Prerequisites
@@ -148,9 +78,13 @@ The project includes a `Makefile` to simplify common tasks:
 *   `make test`: Run unit tests.
 *   `make clean`: Remove build artifacts.
 
-### Releasing
+## Documentation
 
-See the [Releasing Guide](docs/RELEASES.md) for instructions on how to create and publish new releases.
+* **[Features](docs/FEATURES.md)**: Explore the different features Mindloop offers like Intents, Focus Sessions, Habits, and more.
+* **[Architecture](docs/ARCHITECTURE.md)**: Learn about Mindloop's clean architecture, interfaces, and data layer.
+* **[CLI Usage Guide](docs/CLI_USAGE.md)**: Detailed instructions on how to use Mindloop directly from the command line.
+* **[Web UI Documentation](docs/web_ui.md)**: A visual tour of the web interface and responsive design.
+* **[Releasing Guide](docs/RELEASES.md)**: Instructions on how to create and publish new releases.
 
 ## Configuration
 
