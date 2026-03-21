@@ -148,6 +148,10 @@ The project includes a `Makefile` to simplify common tasks:
 *   `make test`: Run unit tests.
 *   `make clean`: Remove build artifacts.
 
+### Releasing
+
+See the [Releasing Guide](docs/RELEASES.md) for instructions on how to create and publish new releases.
+
 ## Configuration
 
 By default, Mindloop runs in **Local Mode** using SQLite.
