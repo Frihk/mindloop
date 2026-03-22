@@ -100,6 +100,8 @@ func MigrateDB(db *gorm.DB) error {
 		&models.SideQuest{},
 		&models.PointTransaction{},
 		&models.Routine{},
+		&models.Task{},
+		&models.SubTask{},
 	)
 	if err != nil {
 		logger.Error().Err(err).Msg("Failed to migrate DB")
