@@ -39,11 +39,9 @@ func CreateRouter(mlh *v1.MindloopHandler) (*mux.Router, error) {
 	r.PathPrefix("/static/").Handler(http.FileServer(staticFS))
 
 	// Routes
-	r.HandleFunc("/healthz", mlh.HandleHealthz).Methods("GET")
-	r.HandleFunc("/login", mlh.HandleLogin).Methods("GET", "POST")
-	r.HandleFunc("/logout", mlh.HandleLogout).Methods("GET", "POST")
-
 	r.HandleFunc("/", mlh.HandleHome).Methods("GET")
+	r.HandleFunc("/healthz", mlh.HandleHealthz).Methods("GET")
+
 	// Journal Routes
 	r.HandleFunc("/journal", mlh.HandleJournalList).Methods("GET")
 	r.HandleFunc("/journal/new", mlh.HandleJournalCreate).Methods("POST")
@@ -107,9 +105,8 @@ func CreateRouter(mlh *v1.MindloopHandler) (*mux.Router, error) {
 	r.HandleFunc("/about", mlh.HandleAbout).Methods("GET")
 	r.HandleFunc("/void", mlh.HandleVoid).Methods("GET")
 
-	r.Use(v1.AuthMiddleware)
-
-	return r, nil}
+	return r, nil
+}
 
 func ServeMindloop(mlh *v1.MindloopHandler) {
 	r, err := CreateRouter(mlh)

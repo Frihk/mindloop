@@ -46,7 +46,6 @@ Turn your productivity into a game with a built-in reward system.
 - **Celebrations**: Enjoy confetti animations when you finish tasks and reach new heights.
 
 ### Settings & Configuration
-- **Security**: Local password protection and session management for the web interface.
 - **Stacked Layout**: Clean, organized settings page with vertical stacking for better focus.
 - **Data Management**: Easy backup, restore, and reset options.
 - **BYODB**: Bring Your Own Database (PostgreSQL) support.

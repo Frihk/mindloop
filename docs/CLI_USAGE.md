@@ -288,24 +288,6 @@ Group multiple habits into a specific time of day.
 
 ---
 
-## Authentication
-
-Manage local access to the Mindloop Web UI.
-
-### Commands
-
-*   **Setup or change password:**
-    ```bash
-    mindloop auth setup
-    ```
-
-*   **Disable password protection:**
-    ```bash
-    mindloop auth disable
-    ```
-
----
-
 ## Summary
 
 Get a bird's-eye view of your productivity metrics.
