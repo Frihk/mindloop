@@ -55,12 +55,12 @@
 </div>
 
 <div class="flex-center mb-lg gap-sm" style="justify-content: flex-start;">
-    <button class="btn btn-sm btn-secondary filter-btn active" data-filter="all"
-        onclick="filterTasks('all')">All</button>
-    <button class="btn btn-sm btn-secondary filter-btn" data-filter="pending"
-        onclick="filterTasks('pending')">Pending</button>
+    <button class="btn btn-sm btn-secondary filter-btn active" data-filter="pending"
+        onclick="filterTasks('pending')">To-Do</button>
     <button class="btn btn-sm btn-secondary filter-btn" data-filter="completed"
         onclick="filterTasks('completed')">Completed</button>
+    <button class="btn btn-sm btn-secondary filter-btn" data-filter="all"
+        onclick="filterTasks('all')">All</button>
 </div>
 
 <div id="tasks-list-container" class="habits-list">
@@ -162,6 +162,12 @@
         <button onclick="toggleAddTask()" class="btn btn-primary mt-md">Create Your First Task</button>
     </div>
     {{ end }}
+
+    <div id="filter-empty-state" class="empty-state animate-fade-in" style="display: none; animation-delay: 0.1s;">
+        <div id="filter-empty-icon" class="empty-icon"></div>
+        <h3 id="filter-empty-title"></h3>
+        <p id="filter-empty-desc"></p>
+    </div>
 </div>
 
 <script>
@@ -176,23 +182,57 @@
     }
 
     function filterTasks(status) {
+        sessionStorage.setItem('tasksFilter', status);
         // Update active button state
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.classList.remove('active');
             if (btn.dataset.filter === status) btn.classList.add('active');
         });
 
+        let visibleCount = 0;
         // Filter task items
         document.querySelectorAll('.task-item').forEach(item => {
             if (status === 'all' || item.dataset.status === status) {
                 item.style.display = 'block';
+                visibleCount++;
             } else {
                 item.style.display = 'none';
             }
         });
+
+        const emptyState = document.getElementById('filter-empty-state');
+        if (emptyState && document.querySelectorAll('.task-item').length > 0) {
+            if (visibleCount === 0) {
+                emptyState.style.display = 'flex';
+                const icon = document.getElementById('filter-empty-icon');
+                const title = document.getElementById('filter-empty-title');
+                const desc = document.getElementById('filter-empty-desc');
+                
+                if (status === 'pending') {
+                    icon.innerHTML = '<i data-lucide="party-popper" style="color: var(--success); width: 48px; height: 48px;"></i>';
+                    title.textContent = 'All Caught Up!';
+                    desc.innerHTML = 'You\'ve cleared your To-Do list. Awesome work!<br><br>Take a breather or add a new task when you\'re ready.';
+                } else if (status === 'completed') {
+                    icon.innerHTML = '<i data-lucide="circle-dashed" style="width: 48px; height: 48px;"></i>';
+                    title.textContent = 'No Completed Tasks';
+                    desc.textContent = 'Keep going! Your completed tasks will appear here.';
+                } else {
+                    icon.innerHTML = '<i data-lucide="list-todo" style="width: 48px; height: 48px;"></i>';
+                    title.textContent = 'No Tasks Found';
+                    desc.textContent = 'Nothing to see here.';
+                }
+                lucide.createIcons();
+            } else {
+                emptyState.style.display = 'none';
+            }
+        }
     }
 
     document.addEventListener('DOMContentLoaded', function () {
+        // Apply saved filter state
+        const savedFilter = sessionStorage.getItem('tasksFilter') || 'pending';
+        filterTasks(savedFilter);
+
         // Initialize SortableJS for main tasks list
         const tasksList = document.getElementById('tasks-list-container');
         if (tasksList) {
@@ -246,6 +286,12 @@
 </script>
 
 <style>
+    .filter-btn.active {
+        background-color: var(--primary);
+        color: var(--text-on-primary);
+        border-color: transparent;
+    }
+
     .sortable-ghost {
         opacity: 0.4;
         background-color: var(--bg-secondary);
