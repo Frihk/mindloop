@@ -2,19 +2,33 @@
 name: Feature request
 about: Suggest an idea for this project
 title: ''
-labels: ''
+labels: enhancement
 assignees: ''
 
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+**Problem**
+What problem are you trying to solve? Include the current behavior and why it is painful.
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+**Proposed solution**
+Describe the behavior you would like to see.
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+**Affected area**
+Check any that apply:
+- [ ] CLI
+- [ ] Web UI
+- [ ] API
+- [ ] Database/storage
+- [ ] Docs
+- [ ] GitHub/project workflow
+- [ ] Agent/developer workflow
+
+**Acceptance criteria**
+What should be true when this is done?
+-
+
+**Alternatives considered**
+List any other approaches you considered.
 
 **Additional context**
-Add any other context or screenshots about the feature request here.
+Add screenshots, mockups, examples, links, or implementation notes.

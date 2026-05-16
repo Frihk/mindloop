@@ -14,7 +14,7 @@ GOFILES=$(wildcard *.go)
 # Make is verbose in Linux. Make it silent.
 MAKEFLAGS += --silent
 
-.PHONY: all build build-cli build-server run-server start-server kill-server test fmt clean help
+.PHONY: all build run-server start-server kill-server test lint fmt clean help
 
 ## all: Build both CLI and Server binaries
 all: build

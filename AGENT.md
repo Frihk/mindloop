@@ -19,7 +19,7 @@ The project operates as a dual-interface application:
 The project follows a clean architecture pattern:
 *   `cmd/`: Application entry points.
     *   `cmd/cli/`: CLI command definitions (Cobra).
-    *   `cmd/server/`: Web server entry point.
+    *   `cmd/cli/server.go`: Server subcommand definition.
 *   `internal/core/`: Business logic domain (Focus, Habit, Intent, Journal, Summary, Quest, Note, Routine).
 *   `api/v1/`: HTTP handlers for the web server.
 *   `db/`: Database connection and schema management.
@@ -43,7 +43,7 @@ The project uses a `Makefile` for build automation.
 
 ### Testing & Verification
 *   **Run Unit Tests:** `make test`
-*   **Linting:** `make lint`
+*   **Linting:** `make lint` (requires `golangci-lint`)
 *   **Formatting:** `make fmt`
 
 ## Configuration & Persistence
@@ -55,4 +55,12 @@ The project uses a `Makefile` for build automation.
 *   **Business Logic:** Look in `internal/core/` for domain rules.
 *   **API Handlers:** Look in `api/v1/` for web interface logic.
 *   **CLI Commands:** Check `cmd/cli/` and `docs/CLI_USAGE.md`.
+*   **Contributor Context:** Check `CONTRIBUTING.md` for human and AI-assisted PR expectations.
 *   **Style:** Always run `make fmt` after modifying Go code.
+
+## Collaboration Workflow
+*   **Before changes:** Read the issue, scan the relevant docs/code paths, and note whether the request affects CLI, Web UI, API, storage, or documentation.
+*   **Docs with features:** When adding or changing user-facing behavior, update the matching docs (`README.md`, `docs/FEATURES.md`, `docs/CLI_USAGE.md`, or `docs/web_ui.md`).
+*   **Experimental areas:** Be explicit about half-baked or evolving features. Routines/Rituals are currently CLI-only and should not be described as fully supported Web UI features.
+*   **Verification:** Run the narrowest useful checks first. Use `make test` for Go changes, and manually verify Markdown links for docs-only changes.
+*   **Pull requests:** Include a concise summary, testing notes, and any docs updates. Call out intentionally skipped checks.
