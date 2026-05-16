@@ -10,8 +10,9 @@ This guide provides a detailed overview of the `mindloop` CLI commands and how t
 - [Habit Tracking](#habit-tracking)
 - [Journaling](#journaling)
 - [Quick Notes](#quick-notes)
+- [The Void](#the-void)
 - [Tasks](#tasks)
-- [Routines](#routines)
+- [Routines](#routines-experimental)
 - [Summary](#summary)
 - [Data Management (Backup & Restore)](#data-management-backup--restore)
 - [Help](#help)
@@ -214,6 +215,14 @@ Capture your thoughts and reflections directly from the terminal.
     mindloop journal delete <entry_id>
     ```
 
+*   **Generate an AI-assisted journal entry:**
+    ```bash
+    mindloop journal generate
+    mindloop journal generate --weekly
+    mindloop journal generate --yearly
+    ```
+    Builds a journal-style reflection from your activity summary, prints it for review, and asks whether to save it.
+
 ---
 
 ## Quick Notes
@@ -255,6 +264,25 @@ Capture ideas, snippets, and important information quickly without context switc
 
 ---
 
+## The Void
+
+Enter a focused breathing session from the terminal.
+
+### Commands
+
+*   **Start the default 5-minute session:**
+    ```bash
+    mindloop void
+    ```
+
+*   **Start a custom duration:**
+    ```bash
+    mindloop void 10
+    ```
+    The optional argument is the number of minutes. Press `Ctrl+C` to exit early.
+
+---
+
 ## Tasks
 
 Manage independent tasks and optionally link them to intents or focus sessions.
@@ -280,9 +308,9 @@ Manage independent tasks and optionally link them to intents or focus sessions.
 
 ---
 
-## Routines
+## Routines (Experimental)
 
-Group multiple habits into a specific time of day.
+Group multiple habits into a specific time of day. This feature is currently CLI-only and experimental; command names and behavior may still change.
 
 ### Commands
 
@@ -322,6 +350,8 @@ Get a bird's-eye view of your productivity metrics.
     mindloop summary --month  # Current month
     mindloop summary --year   # Current year
     ```
+
+    For an AI-written overview based on this summary data, use `mindloop journal generate` with the matching range flag.
 
 ---
 

@@ -1,7 +1,7 @@
 # Web UI Documentation
 
 <p align="center">
-  <img src="img/../static/images/logo-readme.svg" width="160" alt="Mindloop Logo">
+  <img src="../web/static/images/logo-readme.svg" width="160" alt="Mindloop Logo">
 </p>
 
 Mindloop now includes a comprehensive Web UI to manage your productivity workflow. This interface provides access to all core features including Tasks, Journaling, Notes, Habit Tracking, Focus Timer, Intent Management, and Daily Summaries.
@@ -31,8 +31,9 @@ Manage your daily to-dos and break them down into sub-tasks. You can link tasks 
 ![Tasks](img/tasks_final.png)
 
 ## Write (Journal & Notes)
-A dedicated space for your thoughts. 
+A dedicated space for your thoughts.
 - **Journal**: Capture your reflections, ideas, and mood. Supports a clean, distraction-free writing environment.
+- **AI-assisted entries**: Auto-generate a journal draft from daily, weekly, or yearly summary data before saving it.
 - **Notes**: Jot down quick thoughts or keep longer-form reference material.
 
 ![Journal](img/journal_entry_final.png)
@@ -61,10 +62,12 @@ A special place to vent or release thoughts you don't want to keep.
 ## Summary
 View a summary of your activities, including completed focus sessions, habits logged, and journal entries.
 
+The Summary page also includes an AI Overview shortcut that opens the journal generation flow with the selected summary period.
+
 ![Summary](img/summary_final.png)
 
 ## Settings
-Customize your Mindloop experience. You can set your name, choose AI models, manage API keys, and tweak system prompts.
+Customize your Mindloop experience. You can set your name, choose AI models, manage API keys, and tweak system prompts used by AI-assisted journal generation.
 
 ![Settings](img/settings_final.png)
 
