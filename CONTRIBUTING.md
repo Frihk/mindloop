@@ -7,7 +7,7 @@ Thanks for helping improve Mindloop. This project is local-first and intentional
 - Search existing issues and pull requests for related work.
 - For user-facing changes, identify whether the change affects the CLI, Web UI, API, database/storage, docs, or release flow.
 - If a feature is experimental or partially implemented, describe it that way. Routines/Rituals are currently CLI-only and may change.
-- If you are using an AI coding agent or running automated PR sweeps, provide it with `AGENT.md` as project context before making changes.
+- If you are using an AI coding agent or running automated PR sweeps, provide it with `AGENTS.md` as project context before making changes.
 
 ## Development
 
@@ -26,7 +26,7 @@ Update documentation whenever behavior changes:
 - `docs/CLI_USAGE.md` for CLI commands and flags.
 - `docs/web_ui.md` for Web UI behavior and screenshots.
 - `docs/ROADMAP.md` for planned, experimental, or recently completed work.
-- `AGENT.md` for guidance that helps AI coding agents and maintainers navigate the project.
+- `AGENTS.md` for guidance that helps AI coding agents and maintainers navigate the project.
 
 ## Pull Requests
 
