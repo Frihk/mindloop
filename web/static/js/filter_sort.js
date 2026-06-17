@@ -348,7 +348,7 @@
     }
 
     // Watch for HTMX swaps to re-initialize and apply filters
-    document.body.addEventListener('htmx:afterSwap', function (evt) {
+    document.addEventListener('htmx:afterSwap', function (evt) {
         const targetContainer = evt.detail.target;
         console.log('[FilterSort] HTMX swap detected on target:', targetContainer);
         
