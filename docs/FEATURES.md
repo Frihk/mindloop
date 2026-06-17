@@ -13,7 +13,6 @@
 - [AI-Assisted Journal Generation](#ai-assisted-journal-generation)
 - [The Void](#the-void)
 - [Summary](#summary)
-- [Routines & Rituals (Experimental, CLI Only)](#routines--rituals-experimental-cli-only)
 - [Gamification & Points](#gamification--points)
 - [Settings & Configuration](#settings--configuration)
 
@@ -66,12 +65,6 @@ High-level metrics and a bird's-eye view of your productivity data.
 - Review completed intents and habit consistency.
 - Filter data by date ranges.
 - Use summaries as input for AI-assisted journal generation.
-
-## Routines & Rituals (Experimental, CLI Only)
-Group habits into logical time-blocks (e.g., "Morning Routine").
-- Organize your day by sequences.
-- Easily review which habits belong to a specific routine.
-- *Status: Experimental and CLI-only. Web UI support may come later, but the shape of this feature can still change.*
 
 ## Gamification & Points
 Turn your productivity into a game with a built-in reward system.

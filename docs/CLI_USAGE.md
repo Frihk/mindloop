@@ -12,7 +12,6 @@ This guide provides a detailed overview of the `mindloop` CLI commands and how t
 - [Quick Notes](#quick-notes)
 - [The Void](#the-void)
 - [Tasks](#tasks)
-- [Routines](#routines-experimental)
 - [Summary](#summary)
 - [Data Management (Backup & Restore)](#data-management-backup--restore)
 - [Help](#help)
@@ -304,29 +303,6 @@ Manage independent tasks and optionally link them to intents or focus sessions.
 *   **Complete a task:**
     ```bash
     mindloop task complete <task_id>
-    ```
-
----
-
-## Routines (Experimental)
-
-Group multiple habits into a specific time of day. This feature is currently CLI-only and experimental; command names and behavior may still change.
-
-### Commands
-
-*   **Create a routine:**
-    ```bash
-    mindloop routine create "Morning Routine" --time "Morning"
-    ```
-
-*   **Add a habit to a routine:**
-    ```bash
-    mindloop routine add-habit <routine_id> <habit_id>
-    ```
-
-*   **List routines:**
-    ```bash
-    mindloop routine list
     ```
 
 ---
