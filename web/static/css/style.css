@@ -1305,17 +1305,23 @@ html.dark-mode .settings-toggle:hover {
     display: flex;
     align-items: center;
 }
-.filter-sort-bar .search-wrapper i {
+.filter-sort-bar .search-wrapper i,
+.filter-sort-bar .search-wrapper svg {
     position: absolute;
-    left: 0.75rem;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
     color: var(--text-light);
     pointer-events: none;
     width: 16px;
     height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .filter-sort-bar .search-input {
     width: 100%;
-    padding: 0.5rem 0.75rem 0.5rem 2.25rem !important;
+    padding: 0.5rem 1rem 0.5rem 2.75rem !important;
     border: 1px solid var(--border) !important;
     border-radius: var(--radius-md) !important;
     background: var(--bg-surface-alt) !important;
