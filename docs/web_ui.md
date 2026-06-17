@@ -18,6 +18,7 @@ Mindloop now includes a comprehensive Web UI to manage your productivity workflo
 - [Settings](#settings)
 - [Gamification & Celebrations](#gamification--celebrations)
 - [Dark Mode & Theming](#dark-mode--theming)
+- [Filtering, Searching & Sorting](#filtering-searching--sorting)
 - [Technical Architecture](#technical-architecture)
 
 ## Home Dashboard
@@ -82,6 +83,13 @@ Mindloop rewards your productivity with points and celebrations.
 Mindloop features a classy "Teal and Orange" default theme. It includes a built-in Dark Mode for comfortable viewing in low-light environments. Toggle it using the moon/sun icon in the navigation bar.
 
 ![Dark Mode](img/dark_mode_final.png)
+
+## Filtering, Searching & Sorting
+Every major listing view in Mindloop (Tasks, Habits, Notes, Journal, Focus Sessions, and Intents) features an integrated, real-time command bar at the top of the list:
+- **Instant Search**: Type in the search box to immediately highlight items containing your query.
+- **Dynamic Filtering**: Filter lists contextually (e.g., Habits by *Interval*, Tasks by *To-Do/Completed*, Focus Sessions by *Duration*).
+- **Sorting**: Keep lists organized with specialized sorts (e.g., Newest First, Longest Duration, Highest Streak).
+- **Drag & Drop**: Use the *Custom (Drag & Drop)* sort option in the Tasks view to manually reorder tasks.
 
 ## Technical Architecture
 For details on the underlying UI architecture, HTMX integration, and styling system, please refer to [ARCHITECTURE_UI.md](ARCHITECTURE_UI.md).
