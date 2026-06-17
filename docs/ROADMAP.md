@@ -15,7 +15,6 @@ The command-line interface is the heart of Mindloop. Future work will focus on s
 - [ ] **Natural Language Processing**: Basic NLP for intent parsing (e.g., `mindloop intent "Do the thing tomorrow"`).
 - [ ] **Plugins/Extensions**: Allow user scripts to hook into Mindloop events (e.g., specific hooks on `intent start`).
 - [ ] **Sync/Export**: Better export formats (JSON, CSV, Markdown) for data portability.
-- [ ] **Routines & Rituals Hardening**: Decide whether the current CLI-only routine workflow should graduate, change shape, or remain experimental.
 
 ## UI Roadmap
 The Web UI brings Mindloop to a wider audience. The goal is a premium, "vibe-coded" experience that feels native.
