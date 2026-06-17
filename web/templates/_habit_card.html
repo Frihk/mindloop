@@ -1,4 +1,11 @@
-<div class="card card-hover" style="position: relative;" id="habit-card-{{ .ID }}">
+<div class="card card-hover" style="position: relative;" id="habit-card-{{ .ID }}"
+    data-title="{{ .Title }}"
+    data-interval="{{ .Interval }}"
+    data-streak="{{ .Streak }}"
+    data-progress-val="{{ .ProgressPct }}"
+    data-progress="{{ if eq .ActualCount 0 }}not_started{{ else if ge .ActualCount .TargetCount }}completed{{ else }}in_progress{{ end }}"
+    data-date="{{ iso8601 .CreatedAt }}"
+    data-searchable="{{ .Title }}">
     <div class="flex-between mb-sm" style="align-items: flex-start;">
         <div style="flex: 1;">
             <h3 class="mb-sm">

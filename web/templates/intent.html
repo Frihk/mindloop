@@ -187,22 +187,54 @@
     </div>
 
     <div id="history-section" style="display: none;">
+        <div class="filter-sort-bar mb-md" data-target="#intent-history-list">
+            <div class="search-wrapper">
+                <i data-lucide="search"></i>
+                <input type="text" placeholder="Search intent history..." class="search-input">
+            </div>
+            <div class="controls-wrapper">
+                <select class="filter-select" data-filter-key="status">
+                    <option value="">All Statuses</option>
+                    <option value="done">Done</option>
+                    <option value="paused">Paused</option>
+                    <option value="active">Active</option>
+                </select>
+                <select class="sort-select">
+                    <option value="date-desc">Newest First</option>
+                    <option value="date-asc">Oldest First</option>
+                    <option value="title-asc">Title (A-Z)</option>
+                    <option value="title-desc">Title (Z-A)</option>
+                </select>
+            </div>
+        </div>
+
         {{ if .History }}
         <div class="card" style="padding: 0;">
-            {{ range .History }}
-            <div class="flex-between" style="padding: 1rem; border-bottom: 1px solid var(--border);">
-                <div>
-                    <div style="font-weight: 500;">{{ .Name }}</div>
-                    <div class="text-xs text-muted">{{ .CreatedAt.Format "Jan 02" }} - {{ .Status }}</div>
+            <div id="intent-history-list">
+                {{ range .History }}
+                <div class="flex-between" style="padding: 1rem; border-bottom: 1px solid var(--border);"
+                    data-title="{{ .Name }}"
+                    data-date="{{ iso8601 .CreatedAt }}"
+                    data-status="{{ .Status }}"
+                    data-searchable="{{ .Name }}">
+                    <div>
+                        <div style="font-weight: 500;">{{ .Name }}</div>
+                        <div class="text-xs text-muted">{{ .CreatedAt.Format "Jan 02" }} - {{ title .Status }}</div>
+                    </div>
+                    <form action="/intent/delete" method="POST" class="mb-0"
+                        onsubmit="return confirm('Delete this intent?');">
+                        <input type="hidden" name="id" value="{{ .ID }}">
+                        <button type="submit" class="btn btn-danger-outline btn-sm" style="padding: 0.25rem 0.5rem;"><i
+                                data-lucide="trash-2" style="width: 14px;"></i></button>
+                    </form>
                 </div>
-                <form action="/intent/delete" method="POST" class="mb-0"
-                    onsubmit="return confirm('Delete this intent?');">
-                    <input type="hidden" name="id" value="{{ .ID }}">
-                    <button type="submit" class="btn btn-danger-outline btn-sm" style="padding: 0.25rem 0.5rem;"><i
-                            data-lucide="trash-2" style="width: 14px;"></i></button>
-                </form>
+                {{ end }}
+                <div id="filter-empty-state" class="empty-state animate-fade-in" style="display: none; padding: 2rem;">
+                    <div id="filter-empty-icon" class="empty-icon"></div>
+                    <h3 id="filter-empty-title"></h3>
+                    <p id="filter-empty-desc"></p>
+                </div>
             </div>
-            {{ end }}
         </div>
         {{ else }}
         <div class="text-center text-muted" style="padding: 2rem;">No history found.</div>

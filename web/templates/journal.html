@@ -131,65 +131,99 @@
     </div>
 </div>
 
+<div class="filter-sort-bar mb-md animate-slide-up" data-target="#journal-entries-list">
+    <div class="search-wrapper">
+        <i data-lucide="search"></i>
+        <input type="text" placeholder="Search journal entries..." class="search-input">
+    </div>
+    <div class="controls-wrapper">
+        <select class="filter-select" data-filter-key="mood">
+            <option value="">All Moods</option>
+            <option value="neutral">Neutral 😐</option>
+            <option value="happy">Happy 😊</option>
+            <option value="sad">Sad 😔</option>
+            <option value="energetic">Energetic ⚡</option>
+            <option value="calm">Calm 😌</option>
+        </select>
+        <select class="sort-select">
+            <option value="date-desc">Newest First</option>
+            <option value="date-asc">Oldest First</option>
+            <option value="title-asc">Title (A-Z)</option>
+            <option value="title-desc">Title (Z-A)</option>
+        </select>
+    </div>
+</div>
+
 <div class="entries">
     {{ if .Entries }}
-    {{ range .Entries }}
-    <div class="card card-hover" onclick="if(!event.target.closest('button') && !event.target.closest('a')) window.location.href='/journal/view/{{ .ID }}'" style="cursor: pointer;">
-        <div id="display-journal-{{ .ID }}">
-            <div class="flex-between mb-sm" style="align-items: flex-start;">
-                <div>
-                    <h3 style="margin-bottom: 0.25rem;">{{ .Title }} <span class="badge badge-secondary"
-                            style="font-weight: normal; margin-left: 0.5rem;">{{ .Mood }}</span></h3>
-                    <small class="text-muted">{{ .CreatedAt.Format "Jan 02, 2006 15:04" }}</small>
-                </div>
-                <div class="flex-center gap-sm">
-                    <button onclick="toggleEditJournal('{{ .ID }}')" class="btn btn-secondary btn-sm" title="Quick Edit"
-                        style="padding: 0.4rem;"><i data-lucide="edit-2"
-                            style="width: 14px; height: 14px;"></i></button>
-                    <a href="/journal/view/{{ .ID }}" class="btn btn-secondary btn-sm" title="Open Full"
-                        style="padding: 0.4rem;"><i data-lucide="maximize-2" style="width: 14px; height: 14px;"></i></a>
-                    <form action="/journal/delete" method="POST" style="margin: 0;"
-                        onsubmit="return confirm('Delete this entry?');">
-                        <input type="hidden" name="id" value="{{ .ID }}">
-                        <button type="submit" class="btn btn-danger-outline btn-sm" title="Delete"
-                            style="padding: 0.4rem;"><i data-lucide="trash-2"
+    <div id="journal-entries-list" class="flex-col gap-md">
+        {{ range .Entries }}
+        <div class="card card-hover" onclick="if(!event.target.closest('button') && !event.target.closest('a')) window.location.href='/journal/view/{{ .ID }}'" style="cursor: pointer;"
+            data-title="{{ .Title }}"
+            data-mood="{{ .Mood }}"
+            data-date="{{ iso8601 .CreatedAt }}"
+            data-searchable="{{ .Title }} {{ .Content }}">
+            <div id="display-journal-{{ .ID }}">
+                <div class="flex-between mb-sm" style="align-items: flex-start;">
+                    <div>
+                        <h3 style="margin-bottom: 0.25rem;">{{ .Title }} <span class="badge badge-secondary"
+                                style="font-weight: normal; margin-left: 0.5rem;">{{ .Mood }}</span></h3>
+                        <small class="text-muted">{{ .CreatedAt.Format "Jan 02, 2006 15:04" }}</small>
+                    </div>
+                    <div class="flex-center gap-sm">
+                        <button onclick="toggleEditJournal('{{ .ID }}')" class="btn btn-secondary btn-sm" title="Quick Edit"
+                            style="padding: 0.4rem;"><i data-lucide="edit-2"
                                 style="width: 14px; height: 14px;"></i></button>
-                    </form>
+                        <a href="/journal/view/{{ .ID }}" class="btn btn-secondary btn-sm" title="Open Full"
+                            style="padding: 0.4rem;"><i data-lucide="maximize-2" style="width: 14px; height: 14px;"></i></a>
+                        <form action="/journal/delete" method="POST" style="margin: 0;"
+                            onsubmit="return confirm('Delete this entry?');">
+                            <input type="hidden" name="id" value="{{ .ID }}">
+                            <button type="submit" class="btn btn-danger-outline btn-sm" title="Delete"
+                                style="padding: 0.4rem;"><i data-lucide="trash-2"
+                                    style="width: 14px; height: 14px;"></i></button>
+                        </form>
+                    </div>
                 </div>
+                <p class="text-sm text-muted mt-sm mb-0"
+                    style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">{{
+                    .Content }}</p>
             </div>
-            <p class="text-sm text-muted mt-sm mb-0"
-                style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">{{
-                .Content }}</p>
-        </div>
 
-        <!-- Edit Form -->
-        <div id="edit-journal-{{ .ID }}" style="display: none; padding-top: 0.5rem;">
-            <form action="/journal/update" method="POST">
-                <input type="hidden" name="id" value="{{ .ID }}">
-                <div class="form-group mb-sm">
-                    <input type="text" name="title" class="form-control" value="{{ .Title }}" required>
-                </div>
-                <div class="form-group mb-sm">
-                    <select name="mood" class="form-control">
-                        <option value="neutral" {{ if eq .Mood "neutral" }}selected{{ end }}>Neutral 😐</option>
-                        <option value="happy" {{ if eq .Mood "happy" }}selected{{ end }}>Happy 😊</option>
-                        <option value="sad" {{ if eq .Mood "sad" }}selected{{ end }}>Sad 😔</option>
-                        <option value="energetic" {{ if eq .Mood "energetic" }}selected{{ end }}>Energetic ⚡</option>
-                        <option value="calm" {{ if eq .Mood "calm" }}selected{{ end }}>Calm 😌</option>
-                    </select>
-                </div>
-                <div class="form-group mb-sm">
-                    <textarea name="content" class="form-control" rows="4" required>{{ .Content }}</textarea>
-                </div>
-                <div class="flex-end gap-sm mt-md">
-                    <button type="button" class="btn btn-sm btn-secondary"
-                        onclick="toggleEditJournal('{{ .ID }}')">Cancel</button>
-                    <button type="submit" class="btn btn-sm btn-primary">Save</button>
-                </div>
-            </form>
+            <!-- Edit Form -->
+            <div id="edit-journal-{{ .ID }}" style="display: none; padding-top: 0.5rem;">
+                <form action="/journal/update" method="POST">
+                    <input type="hidden" name="id" value="{{ .ID }}">
+                    <div class="form-group mb-sm">
+                        <input type="text" name="title" class="form-control" value="{{ .Title }}" required>
+                    </div>
+                    <div class="form-group mb-sm">
+                        <select name="mood" class="form-control">
+                            <option value="neutral" {{ if eq .Mood "neutral" }}selected{{ end }}>Neutral 😐</option>
+                            <option value="happy" {{ if eq .Mood "happy" }}selected{{ end }}>Happy 😊</option>
+                            <option value="sad" {{ if eq .Mood "sad" }}selected{{ end }}>Sad 😔</option>
+                            <option value="energetic" {{ if eq .Mood "energetic" }}selected{{ end }}>Energetic ⚡</option>
+                            <option value="calm" {{ if eq .Mood "calm" }}selected{{ end }}>Calm 😌</option>
+                        </select>
+                    </div>
+                    <div class="form-group mb-sm">
+                        <textarea name="content" class="form-control" rows="4" required>{{ .Content }}</textarea>
+                    </div>
+                    <div class="flex-end gap-sm mt-md">
+                        <button type="button" class="btn btn-sm btn-secondary"
+                            onclick="toggleEditJournal('{{ .ID }}')">Cancel</button>
+                        <button type="submit" class="btn btn-sm btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {{ end }}
+        <div id="filter-empty-state" class="empty-state animate-fade-in" style="display: none; padding: 3rem;">
+            <div id="filter-empty-icon" class="empty-icon"></div>
+            <h3 id="filter-empty-title"></h3>
+            <p id="filter-empty-desc"></p>
         </div>
     </div>
-    {{ end }}
     {{ else }}
     <div class="empty-state">
         <div class="empty-icon mb-md"><i data-lucide="book" style="width: 48px; height: 48px; color: var(--primary);"></i></div>

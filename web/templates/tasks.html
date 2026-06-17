@@ -54,20 +54,47 @@
     </form>
 </div>
 
-<div class="segmented-control mb-lg">
-    <button class="segmented-btn filter-btn active" data-filter="pending"
-        onclick="filterTasks('pending')">To-Do</button>
-    <button class="segmented-btn filter-btn" data-filter="completed"
-        onclick="filterTasks('completed')">Completed</button>
-    <button class="segmented-btn filter-btn" data-filter="all"
-        onclick="filterTasks('all')">All</button>
+<div class="filter-sort-bar mb-lg animate-slide-up" id="tasks-filter-bar" data-target="#tasks-list-container" data-active-segment="pending">
+    <div class="search-wrapper">
+        <i data-lucide="search"></i>
+        <input type="text" placeholder="Search tasks..." class="search-input">
+    </div>
+    
+    <div class="controls-wrapper">
+        <div class="segmented-control" style="margin-bottom: 0;">
+            <button class="segmented-btn active" data-filter="pending">To-Do</button>
+            <button class="segmented-btn" data-filter="completed">Completed</button>
+            <button class="segmented-btn" data-filter="all">All</button>
+        </div>
+        
+        <select class="filter-select" data-filter-key="intent" id="task-intent-filter">
+            <option value="">All Intents</option>
+            <option value="standalone">Standalone Tasks</option>
+            {{ range .ActiveIntents }}
+            <option value="{{ .Name }}">{{ .Name }}</option>
+            {{ end }}
+        </select>
+        
+        <select class="sort-select">
+            <option value="custom">Custom (Drag & Drop)</option>
+            <option value="title-asc">Title (A-Z)</option>
+            <option value="title-desc">Title (Z-A)</option>
+            <option value="date-desc">Newest First</option>
+            <option value="date-asc">Oldest First</option>
+        </select>
+    </div>
 </div>
 
 <div id="tasks-list-container" class="habits-list">
     {{ if .Tasks }}
     {{ range .Tasks }}
     <div class="card mb-md task-item animate-slide-up" data-id="{{ .ID }}" data-status="{{ .Status }}"
-        style="{{ if eq .Status " completed" }}opacity: 0.75; background-color: rgba(40, 167, 69, 0.03); border-color: rgba(40, 167, 69, 0.15);{{ end }}">
+        data-title="{{ .Title }}"
+        data-intent="{{ .IntentName }}"
+        data-focus="{{ .FocusSessionTitle }}"
+        data-date="{{ .CreatedAt }}"
+        data-searchable="{{ .Title }}"
+        style="{{ if eq .Status "completed" }}opacity: 0.75; background-color: rgba(40, 167, 69, 0.03); border-color: rgba(40, 167, 69, 0.15);{{ end }}">
         <div class="flex-between">
             <div style="display: flex; align-items: center; gap: 0.5rem;">
                 <div class="drag-handle" style="cursor: grab; color: var(--text-secondary); opacity: 0.5;">
@@ -181,57 +208,8 @@
         }
     }
 
-    function filterTasks(status) {
-        sessionStorage.setItem('tasksFilter', status);
-        // Update active button state
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.classList.remove('active');
-            if (btn.dataset.filter === status) btn.classList.add('active');
-        });
-
-        let visibleCount = 0;
-        // Filter task items
-        document.querySelectorAll('.task-item').forEach(item => {
-            if (status === 'all' || item.dataset.status === status) {
-                item.style.display = 'block';
-                visibleCount++;
-            } else {
-                item.style.display = 'none';
-            }
-        });
-
-        const emptyState = document.getElementById('filter-empty-state');
-        if (emptyState && document.querySelectorAll('.task-item').length > 0) {
-            if (visibleCount === 0) {
-                emptyState.style.display = 'flex';
-                const icon = document.getElementById('filter-empty-icon');
-                const title = document.getElementById('filter-empty-title');
-                const desc = document.getElementById('filter-empty-desc');
-                
-                if (status === 'pending') {
-                    icon.innerHTML = '<i data-lucide="party-popper" style="color: var(--success); width: 48px; height: 48px;"></i>';
-                    title.textContent = 'All Caught Up!';
-                    desc.innerHTML = 'You\'ve cleared your To-Do list. Awesome work!<br><br>Take a breather or add a new task when you\'re ready.';
-                } else if (status === 'completed') {
-                    icon.innerHTML = '<i data-lucide="circle-dashed" style="width: 48px; height: 48px;"></i>';
-                    title.textContent = 'No Completed Tasks';
-                    desc.textContent = 'Keep going! Your completed tasks will appear here.';
-                } else {
-                    icon.innerHTML = '<i data-lucide="list-todo" style="width: 48px; height: 48px;"></i>';
-                    title.textContent = 'No Tasks Found';
-                    desc.textContent = 'Nothing to see here.';
-                }
-                lucide.createIcons();
-            } else {
-                emptyState.style.display = 'none';
-            }
-        }
-    }
-
     document.addEventListener('DOMContentLoaded', function () {
-        // Apply saved filter state
-        const savedFilter = sessionStorage.getItem('tasksFilter') || 'pending';
-        filterTasks(savedFilter);
+
 
         // Initialize SortableJS for main tasks list
         const tasksList = document.getElementById('tasks-list-container');

@@ -1277,3 +1277,117 @@ html.dark-mode .settings-toggle:hover {
     background-clip: text;
     color: var(--primary);
 }
+
+/* Filter & Sort Bar Styles */
+.filter-sort-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    background: var(--bg-surface);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.filter-sort-bar:focus-within {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-glow);
+}
+.filter-sort-bar .search-wrapper {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+    display: flex;
+    align-items: center;
+}
+.filter-sort-bar .search-wrapper i {
+    position: absolute;
+    left: 0.75rem;
+    color: var(--text-light);
+    pointer-events: none;
+    width: 16px;
+    height: 16px;
+}
+.filter-sort-bar .search-input {
+    width: 100%;
+    padding: 0.5rem 0.75rem 0.5rem 2.25rem !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-md) !important;
+    background: var(--bg-surface-alt) !important;
+    color: var(--text-main) !important;
+    font-size: 0.9rem !important;
+    outline: none !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+.filter-sort-bar .search-input:focus {
+    border-color: var(--primary) !important;
+    box-shadow: none !important;
+}
+.filter-sort-bar .controls-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+.filter-sort-bar select.filter-select,
+.filter-sort-bar select.sort-select {
+    width: auto !important;
+    padding: 0.5rem 2.25rem 0.5rem 0.75rem !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-md) !important;
+    background: var(--bg-surface-alt) !important;
+    color: var(--text-main) !important;
+    font-size: 0.9rem !important;
+    outline: none !important;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.75rem center !important;
+    background-size: 1rem !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    min-width: 140px;
+    transition: border-color 0.2s ease !important;
+}
+.dark-mode .filter-sort-bar select.filter-select,
+.dark-mode .filter-sort-bar select.sort-select {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+}
+.filter-sort-bar select.filter-select:hover,
+.filter-sort-bar select.sort-select:hover {
+    border-color: var(--primary) !important;
+}
+
+/* Responsive Styles for Filter Bar */
+@media (max-width: 768px) {
+    .filter-sort-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+    .filter-sort-bar .search-wrapper {
+        width: 100%;
+    }
+    .filter-sort-bar .controls-wrapper {
+        width: 100%;
+        justify-content: flex-start;
+        gap: 0.5rem;
+    }
+    .filter-sort-bar select.filter-select,
+    .filter-sort-bar select.sort-select,
+    .filter-sort-bar .segmented-control {
+        flex: 1;
+        min-width: 110px;
+    }
+}
+
+/* Hidden elements with transition */
+.filter-item-hidden {
+    display: none !important;
+}
