@@ -11,6 +11,8 @@
 
 **Mindloop** is a comprehensive productivity suite designed for local-first workflow management. It operates as a **CLI tool**, a **local API**, and a **UI**, utilizing a local SQLite database with BYODB (Bring Your Own Database) support.
 
+Recent highlights include AI-assisted journal generation, a CLI breathing mode called **The Void**, configurable gamification milestones, and improved task/sub-task completion behavior.
+
 ## Table of Contents
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
@@ -64,7 +66,7 @@ Download the latest pre-compiled binary for your OS from the [Releases Page](htt
     ```bash
     make build
     ```
-    This generates `mindloop` (CLI) and `mindloop-server` (Server) binaries.
+    This generates the `mindloop` binary. The same binary provides both CLI commands and the local server via `mindloop server`.
 
 3.  **Run the Server (Quick Start):**
     For local development with the UI:
@@ -77,7 +79,7 @@ Download the latest pre-compiled binary for your OS from the [Releases Page](htt
     ```bash
     make run-server PORT=9000 MODE=byodb
     ```
-    
+
     Access the UI at [http://localhost:8765](http://localhost:8765)
 
     **Live Reloading (Development):**
@@ -96,12 +98,14 @@ Download the latest pre-compiled binary for your OS from the [Releases Page](htt
 
 The project includes a `Makefile` to simplify common tasks:
 
-*   `make build`: Build both the CLI and Server binaries.
-*   `make build-cli`: Build only the CLI binary.
+*   `make build`: Build the binary.
+*   `make run-server`: Run the local server in the foreground.
 *   `make dev`: Run the server with live-reloading (requires `air`).
 *   `make start-server`: Build and run the server in the background (daemon).
 *   `make kill-server`: Stop the background server.
 *   `make test`: Run unit tests.
+*   `make lint`: Run `golangci-lint`.
+*   `make fmt`: Format Go files.
 *   `make clean`: Remove build artifacts.
 
 ## Documentation
@@ -110,7 +114,9 @@ The project includes a `Makefile` to simplify common tasks:
 * **[Architecture](docs/ARCHITECTURE.md)**: Learn about Mindloop's clean architecture, interfaces, and data layer.
 * **[CLI Usage Guide](docs/CLI_USAGE.md)**: Detailed instructions on how to use Mindloop directly from the command line.
 * **[Web UI Documentation](docs/web_ui.md)**: A visual tour of the web interface and responsive design.
+* **[Roadmap](docs/ROADMAP.md)**: Current development status, experimental areas, and planned directions.
 * **[Releasing Guide](docs/RELEASES.md)**: Instructions on how to create and publish new releases.
+* **[Contributing](CONTRIBUTING.md)**: Guidance for contributors, maintainers, and AI coding agents.
 
 ## Configuration
 

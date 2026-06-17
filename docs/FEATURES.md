@@ -10,6 +10,7 @@
 - [Tasks & Sub-tasks](#tasks--sub-tasks)
 - [Habits](#habits)
 - [Write (Journal & Notes)](#write-journal--notes)
+- [AI-Assisted Journal Generation](#ai-assisted-journal-generation)
 - [The Void](#the-void)
 - [Summary](#summary)
 - [Gamification & Points](#gamification--points)
@@ -45,14 +46,25 @@ A dedicated space for your thoughts.
 - **Journal**: A space for reflections, end-of-day closure, or gratitude logging. Features mood tracking and rich markdown support. "Close the loop" at the end of your workday.
 - **Notes**: Quickly capture thoughts, ideas, or longer-form reference material that doesn't fit into a daily journal entry.
 
+## AI-Assisted Journal Generation
+Generate a reflective journal entry from your activity data.
+- **CLI support**: Use `mindloop journal generate` with daily, weekly, or yearly ranges.
+- **Web UI support**: Use the Journal auto-generate flow, or the Summary page's AI Overview shortcut.
+- **Summary-backed**: The generated entry is based on Mindloop summary data such as intents, focus sessions, habits, and completed work.
+- **Optional save flow**: Review the generated text before choosing whether to save it into the journal.
+- **Configurable AI settings**: Manage model and prompt settings from the Settings page.
+
 ## The Void
 A specialized feature to write down thoughts, worries, or frustrations and let them disappear. Perfect for clearing your mind before deep work.
+- **Web UI**: A place to release thoughts without keeping them as permanent notes.
+- **CLI support**: `mindloop void [minutes]` starts a timed breathing session. The default duration is 5 minutes.
 
 ## Summary
 High-level metrics and a bird's-eye view of your productivity data.
 - Visualize time spent in focus.
 - Review completed intents and habit consistency.
 - Filter data by date ranges.
+- Use summaries as input for AI-assisted journal generation.
 
 ## Gamification & Points
 Turn your productivity into a game with a built-in reward system.
@@ -67,4 +79,4 @@ Turn your productivity into a game with a built-in reward system.
 - **Data Management**: Easy backup, restore, and reset options.
 - **BYODB**: Bring Your Own Database (PostgreSQL) support.
 
-> **Note:** For a visual tour of the interface and responsive design, checking out the [Web UI Documentation](docs/web_ui.md).
+> **Note:** For a visual tour of the interface and responsive design, check out the [Web UI Documentation](web_ui.md).
