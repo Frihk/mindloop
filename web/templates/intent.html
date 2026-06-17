@@ -193,18 +193,31 @@
                 <input type="text" placeholder="Search intent history..." class="search-input">
             </div>
             <div class="controls-wrapper">
-                <select class="filter-select" data-filter-key="status">
-                    <option value="">All Statuses</option>
-                    <option value="done">Done</option>
-                    <option value="paused">Paused</option>
-                    <option value="active">Active</option>
-                </select>
-                <select class="sort-select">
-                    <option value="date-desc">Newest First</option>
-                    <option value="date-asc">Oldest First</option>
-                    <option value="title-asc">Title (A-Z)</option>
-                    <option value="title-desc">Title (Z-A)</option>
-                </select>
+                <div class="control-group">
+                    <span class="control-label">
+                        <i data-lucide="filter"></i>
+                        <span>Filter</span>
+                    </span>
+                    <select class="filter-select" data-filter-key="status">
+                        <option value="">All Statuses</option>
+                        <option value="done">Done</option>
+                        <option value="paused">Paused</option>
+                        <option value="active">Active</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <span class="control-label">
+                        <i data-lucide="arrow-up-down"></i>
+                        <span>Sort</span>
+                    </span>
+                    <select class="sort-select">
+                        <option value="date-desc">Newest First</option>
+                        <option value="date-asc">Oldest First</option>
+                        <option value="title-asc">Title (A-Z)</option>
+                        <option value="title-desc">Title (Z-A)</option>
+                    </select>
+                </div>
             </div>
         </div>
 

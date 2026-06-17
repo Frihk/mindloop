@@ -1340,15 +1340,64 @@ html.dark-mode .settings-toggle:hover {
     gap: 0.75rem;
     flex-wrap: wrap;
 }
-.filter-sort-bar select.filter-select,
-.filter-sort-bar select.sort-select {
-    width: auto !important;
-    padding: 0.5rem 2.25rem 0.5rem 0.75rem !important;
+
+/* Unified Control Group Wrapper */
+.filter-sort-bar .control-group {
+    display: inline-flex;
+    align-items: center;
+    background: var(--bg-surface-alt) !important;
     border: 1px solid var(--border) !important;
     border-radius: var(--radius-md) !important;
-    background: var(--bg-surface-alt) !important;
+    padding-left: 0.75rem !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+    cursor: pointer;
+    min-height: 38px;
+}
+.filter-sort-bar .control-group:hover {
+    border-color: var(--primary) !important;
+}
+.filter-sort-bar .control-group:focus-within {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.15) !important;
+}
+
+/* Control prefix label */
+.filter-sort-bar .control-group .control-label {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-light);
+    white-space: nowrap;
+    border-right: 1px solid var(--border);
+    padding-right: 0.6rem;
+    margin-right: 0.5rem;
+    pointer-events: none;
+    user-select: none;
+}
+.filter-sort-bar .control-group .control-label svg,
+.filter-sort-bar .control-group .control-label i {
+    width: 12px;
+    height: 12px;
+    color: var(--text-light);
+    display: inline-block;
+}
+
+.filter-sort-bar .control-group select.filter-select,
+.filter-sort-bar .control-group select.sort-select {
+    width: auto !important;
+    border: none !important;
+    background-color: transparent !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0.4rem 2.25rem 0.4rem 0.25rem !important;
+    margin: 0 !important;
     color: var(--text-main) !important;
-    font-size: 0.9rem !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
     outline: none !important;
     cursor: pointer;
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
@@ -1358,16 +1407,11 @@ html.dark-mode .settings-toggle:hover {
     -webkit-appearance: none !important;
     -moz-appearance: none !important;
     appearance: none !important;
-    min-width: 140px;
-    transition: border-color 0.2s ease !important;
+    min-width: 120px;
 }
-.dark-mode .filter-sort-bar select.filter-select,
-.dark-mode .filter-sort-bar select.sort-select {
+.dark-mode .filter-sort-bar .control-group select.filter-select,
+.dark-mode .filter-sort-bar .control-group select.sort-select {
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
-}
-.filter-sort-bar select.filter-select:hover,
-.filter-sort-bar select.sort-select:hover {
-    border-color: var(--primary) !important;
 }
 
 /* Responsive Styles for Filter Bar */
@@ -1385,11 +1429,14 @@ html.dark-mode .settings-toggle:hover {
         justify-content: flex-start;
         gap: 0.5rem;
     }
-    .filter-sort-bar select.filter-select,
-    .filter-sort-bar select.sort-select,
+    .filter-sort-bar .control-group,
     .filter-sort-bar .segmented-control {
         flex: 1;
         min-width: 110px;
+    }
+    .filter-sort-bar .control-group select.filter-select,
+    .filter-sort-bar .control-group select.sort-select {
+        width: 100% !important;
     }
 }
 

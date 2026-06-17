@@ -67,21 +67,33 @@
             <button class="segmented-btn" data-filter="all">All</button>
         </div>
         
-        <select class="filter-select" data-filter-key="intent" id="task-intent-filter">
-            <option value="">All Intents</option>
-            <option value="standalone">Standalone Tasks</option>
-            {{ range .ActiveIntents }}
-            <option value="{{ .Name }}">{{ .Name }}</option>
-            {{ end }}
-        </select>
+        <div class="control-group">
+            <span class="control-label">
+                <i data-lucide="tag"></i>
+                <span>Tags</span>
+            </span>
+            <select class="filter-select" data-filter-key="intent" id="task-intent-filter">
+                <option value="">All Intents</option>
+                <option value="standalone">Standalone Tasks</option>
+                {{ range .ActiveIntents }}
+                <option value="{{ .Name }}">{{ .Name }}</option>
+                {{ end }}
+            </select>
+        </div>
         
-        <select class="sort-select">
-            <option value="custom">Custom (Drag & Drop)</option>
-            <option value="title-asc">Title (A-Z)</option>
-            <option value="title-desc">Title (Z-A)</option>
-            <option value="date-desc">Newest First</option>
-            <option value="date-asc">Oldest First</option>
-        </select>
+        <div class="control-group">
+            <span class="control-label">
+                <i data-lucide="arrow-up-down"></i>
+                <span>Sort</span>
+            </span>
+            <select class="sort-select">
+                <option value="custom">Custom (Drag & Drop)</option>
+                <option value="title-asc">Title (A-Z)</option>
+                <option value="title-desc">Title (Z-A)</option>
+                <option value="date-desc">Newest First</option>
+                <option value="date-asc">Oldest First</option>
+            </select>
+        </div>
     </div>
 </div>
 

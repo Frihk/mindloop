@@ -62,24 +62,44 @@
         <input type="text" placeholder="Search habits..." class="search-input">
     </div>
     <div class="controls-wrapper">
-        <select class="filter-select" data-filter-key="interval">
-            <option value="">All Intervals</option>
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-        </select>
-        <select class="filter-select" data-filter-key="progress">
-            <option value="">All Progress</option>
-            <option value="not_started">Not Started</option>
-            <option value="in_progress">In Progress</option>
-            <option value="completed">Completed</option>
-        </select>
-        <select class="sort-select">
-            <option value="streak-desc">Highest Streak</option>
-            <option value="progress-val-desc">Highest Progress %</option>
-            <option value="title-asc">Title (A-Z)</option>
-            <option value="title-desc">Title (Z-A)</option>
-            <option value="date-desc">Newest First</option>
-        </select>
+        <div class="control-group">
+            <span class="control-label">
+                <i data-lucide="filter"></i>
+                <span>Filter</span>
+            </span>
+            <select class="filter-select" data-filter-key="interval">
+                <option value="">All Intervals</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+            </select>
+        </div>
+        
+        <div class="control-group">
+            <span class="control-label">
+                <i data-lucide="filter"></i>
+                <span>Filter</span>
+            </span>
+            <select class="filter-select" data-filter-key="progress">
+                <option value="">All Progress</option>
+                <option value="not_started">Not Started</option>
+                <option value="in_progress">In Progress</option>
+                <option value="completed">Completed</option>
+            </select>
+        </div>
+        
+        <div class="control-group">
+            <span class="control-label">
+                <i data-lucide="arrow-up-down"></i>
+                <span>Sort</span>
+            </span>
+            <select class="sort-select">
+                <option value="streak-desc">Highest Streak</option>
+                <option value="progress-val-desc">Highest Progress %</option>
+                <option value="title-asc">Title (A-Z)</option>
+                <option value="title-desc">Title (Z-A)</option>
+                <option value="date-desc">Newest First</option>
+            </select>
+        </div>
     </div>
 </div>
 

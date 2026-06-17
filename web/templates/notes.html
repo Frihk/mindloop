@@ -45,15 +45,27 @@
             <input type="text" placeholder="Search notes..." class="search-input">
         </div>
         <div class="controls-wrapper">
-            <select class="filter-select" data-filter-key="labels" data-dynamic="true">
-                <option value="">All Labels</option>
-            </select>
-            <select class="sort-select">
-                <option value="date-desc">Recently Updated</option>
-                <option value="date-asc">Oldest First</option>
-                <option value="title-asc">Title (A-Z)</option>
-                <option value="title-desc">Title (Z-A)</option>
-            </select>
+            <div class="control-group">
+                <span class="control-label">
+                    <i data-lucide="tag"></i>
+                    <span>Tags</span>
+                </span>
+                <select class="filter-select" data-filter-key="labels" data-dynamic="true">
+                    <option value="">All Labels</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <span class="control-label">
+                    <i data-lucide="arrow-up-down"></i>
+                    <span>Sort</span>
+                </span>
+                <select class="sort-select">
+                    <option value="date-desc">Recently Updated</option>
+                    <option value="date-asc">Oldest First</option>
+                    <option value="title-asc">Title (A-Z)</option>
+                    <option value="title-desc">Title (Z-A)</option>
+                </select>
+            </div>
         </div>
     </div>
 

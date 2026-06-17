@@ -13,20 +13,33 @@
             <input type="text" placeholder="Search focus sessions..." class="search-input">
         </div>
         <div class="controls-wrapper">
-            <select class="filter-select" data-filter-key="duration">
-                <option value="">All Durations</option>
-                <option value="short">Short (&lt; 25m)</option>
-                <option value="pomodoro">Pomodoro (25m - 50m)</option>
-                <option value="long">Long (&gt; 50m)</option>
-            </select>
-            <select class="sort-select">
-                <option value="date-desc">Newest First</option>
-                <option value="date-asc">Oldest First</option>
-                <option value="duration-desc">Longest Duration</option>
-                <option value="duration-asc">Shortest Duration</option>
-                <option value="title-asc">Title (A-Z)</option>
-                <option value="title-desc">Title (Z-A)</option>
-            </select>
+            <div class="control-group">
+                <span class="control-label">
+                    <i data-lucide="filter"></i>
+                    <span>Filter</span>
+                </span>
+                <select class="filter-select" data-filter-key="duration">
+                    <option value="">All Durations</option>
+                    <option value="short">Short (&lt; 25m)</option>
+                    <option value="pomodoro">Pomodoro (25m - 50m)</option>
+                    <option value="long">Long (&gt; 50m)</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <span class="control-label">
+                    <i data-lucide="arrow-up-down"></i>
+                    <span>Sort</span>
+                </span>
+                <select class="sort-select">
+                    <option value="date-desc">Newest First</option>
+                    <option value="date-asc">Oldest First</option>
+                    <option value="duration-desc">Longest Duration</option>
+                    <option value="duration-asc">Shortest Duration</option>
+                    <option value="title-asc">Title (A-Z)</option>
+                    <option value="title-desc">Title (Z-A)</option>
+                </select>
+            </div>
         </div>
     </div>
 
