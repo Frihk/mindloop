@@ -132,6 +132,13 @@ Focus sessions allow you to track time spent on specific tasks, helping you stay
     ```
     Stops the timer and records the session duration.
 
+*   **Check session status:**
+    ```bash
+    mindloop focus status
+    mindloop focus status --format=compact  # For tmux/waybar integration
+    ```
+    Displays the remaining time and progress of the active session.
+
 *   **Rate a session:**
     ```bash
     mindloop focus rate <session_id> <rating>
@@ -245,10 +252,16 @@ Capture ideas, snippets, and important information quickly without context switc
 
 ### Commands
 
-*   **Quick capture:**
+*   **Quick capture (Note):**
     ```bash
     mindloop note "Meeting with team at 3 PM"
     ```
+
+*   **Quick-Dump (Capture on the Fly):**
+    ```bash
+    mindloop dump "Need to buy milk later"
+    ```
+    Sub-100ms ultra-fast execution for side-thoughts without losing context.
 
 *   **New note (Editor):**
     ```bash
@@ -319,6 +332,12 @@ Manage independent tasks and optionally link them to intents or focus sessions.
     ```bash
     mindloop task complete <task_id>
     ```
+
+*   **AI Micro-Task Chunker:**
+    ```bash
+    mindloop chunk "Implement feature X"
+    ```
+    Automatically decompose an intention or large task into 3-5 actionable sub-15min micro-steps using the LLM.
 
 ---
 

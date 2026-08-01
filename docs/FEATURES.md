@@ -31,6 +31,7 @@ Set a single-threaded goal to maintain absolute focus. **One thing at a time.**
 
 ## Focus Sessions
 Break your intents into deep work chunks with a built-in timer.
+- **Time Blindness Visual Pacing**: Subtle ambient background color shifts and a progress rail in the Web UI visually anchor your time. CLI supports a compact tmux-friendly format via `mindloop focus status --format=compact`.
 - Track duration and frequency of deep work.
 - Associate sessions directly with your active Intent.
 
@@ -41,12 +42,15 @@ Manage independent to-do items and link them to your bigger goals.
 - **Sub-tasks**: Break tasks into smaller, actionable sub-tasks with independent completion tracking.
 - **Link to Intents & Focus Sessions**: Optionally attach tasks to an active Intent or Focus Session when creating them.
 - **Inline Task Creation**: Add tasks directly from within the Intent or Focus Session views via a toggleable form.
+- **AI Micro-Task Chunker**: Use the magic wand icon in the Web UI (or `mindloop chunk` in CLI) to automatically decompose large tasks into 3-5 actionable sub-15min micro-steps using the LLM.
 - **Drag & Drop Reordering**: Reorder tasks and sub-tasks with persistent drag-and-drop.
 - **Status Filtering**: Filter the task list by All, Pending, or Completed status.
 - **Visual Polish**: Completed tasks are dimmed with a subtle green tint; pill-shaped action buttons with hover effects.
 
 ## Habits
 Track daily and weekly habits to build consistency.
+- **Anti-Shame Momentum Engine**: Replaces strict binary streaks with a decaying Momentum Index (10% decay per missed day) to prevent demotivation. Visualized by a Momentum ring.
+- **Emergency Recalibration**: A "Fresh Start" workflow to clear task backlogs without failing them.
 - **Activity Heatmap**: Visualize your consistency with a GitHub-style activity grid.
 - Simple check-in system with streak tracking.
 
@@ -54,6 +58,7 @@ Track daily and weekly habits to build consistency.
 A dedicated space for your thoughts.
 - **Journal**: A space for reflections, end-of-day closure, or gratitude logging. Features mood tracking and rich markdown support. "Close the loop" at the end of your workday.
 - **Notes**: Quickly capture thoughts, ideas, or longer-form reference material that doesn't fit into a daily journal entry. Use the "Quick Note" widget on the Dashboard to capture instantly.
+- **Quick-Dump**: Use the `Cmd+K` floating modal in the Web UI, or the sub-100ms `mindloop dump "<text>"` CLI command, for on-the-fly thought capture without context switching.
 
 ## Command Palette & Navigation
 Frictionless navigation across the entire Web UI.
