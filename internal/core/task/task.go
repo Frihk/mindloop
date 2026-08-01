@@ -192,5 +192,5 @@ func (s *Service) GetTask(id uint) (*models.Task, error) {
 // RecalibrateTasks clears due dates for all pending tasks that were due in the past
 func (s *Service) RecalibrateTasks() error {
 	today := time.Now().Truncate(24 * time.Hour)
-	return s.db.Model(&models.Task{}).Where("status = ? AND due_date < ?", "pending", today).Update("due_date", nil).Error
+	return s.db.Model(&models.Task{}).Where("Status = ? AND DueDate < ?", "pending", today).Update("DueDate", nil).Error
 }
