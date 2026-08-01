@@ -225,7 +225,7 @@ func (s *Service) DeleteAll() error {
 }
 
 func (s *Service) RecalibrateAll() error {
-	return s.DB.Session(&gorm.Session{AllowGlobalUpdate: true}).Model(&models.Habit{}).Update("recalibrated_at", time.Now()).Error
+	return s.DB.Session(&gorm.Session{AllowGlobalUpdate: true}).Model(&models.Habit{}).Update("RecalibratedAt", time.Now()).Error
 }
 
 func (s *Service) CalculateMomentumFromLogs(habit *models.Habit, logs []models.HabitLog) int {

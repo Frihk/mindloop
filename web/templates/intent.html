@@ -124,12 +124,10 @@
                 {{ end }}
             </div>
             {{ end }}
-        </div>
+        {{ else }}
+            <p class="text-sm text-muted text-center mb-0">No tasks added to this intent yet.</p>
         {{ end }}
         </div>
-        {{ if not .Tasks }}
-        <p class="text-sm text-muted text-center">No tasks added to this intent yet.</p>
-        {{ end }}
     </div>
     {{ end }}
 

@@ -13,7 +13,7 @@
 </div>
 {{ end }}
 
-    <div class="page-header" style="margin-bottom: 2.5rem;">
+    <div class="page-header" style="margin-bottom: 2.5rem; display: flex; justify-content: space-between; align-items: flex-start;">
         <div>
             <h1 style="font-weight: 800; font-size: 2.5rem; margin-bottom: 0.2rem;">
                 {{ if .UserName }}
@@ -24,6 +24,9 @@
             </h1>
             <p class="text-muted" style="font-size: 1.1rem; margin-bottom: 0;">Here's your command center for today.</p>
         </div>
+        <button class="btn btn-sm btn-secondary" style="color: var(--warning); border-color: var(--warning);" onclick="document.getElementById('recalibrate-modal').style.display='flex'">
+            <i data-lucide="refresh-cw" class="icon-sm"></i> Fresh Start
+        </button>
     </div>
 
     <div class="grid home-grid">
