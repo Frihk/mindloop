@@ -309,6 +309,7 @@ type SummaryReport struct {
 	Intents        []IntentStats
 	Points         PointStats
 	TasksCompleted int
+	PeakHours      map[int]int
 }
 
 // SideQuest represents an ad-hoc task during a focus session

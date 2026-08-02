@@ -776,14 +776,21 @@ func (mlh *MindloopHandler) HandleSummary(w http.ResponseWriter, r *http.Request
 	dailyHabits, _ := mlh.summary.GetHabitSeries(start, now)
 	dailyPoints, _ := mlh.summary.GetPointSeries(start, now)
 
+	// Convert PeakHours map to array for chart (hours 0-23)
+	peakHoursData := make([]int, 24)
+	for i := 0; i < 24; i++ {
+		peakHoursData[i] = report.PeakHours[i]
+	}
+
 	mlh.renderTemplate(w, "summary.html", map[string]interface{}{
 		"Title":  "Summary",
 		"Report": report,
 		"Charts": map[string]interface{}{
-			"Labels":      labels,
-			"DailyFocus":  dailyFocus,
-			"DailyHabits": dailyHabits,
-			"DailyPoints": dailyPoints,
+			"Labels":        labels,
+			"DailyFocus":    dailyFocus,
+			"DailyHabits":   dailyHabits,
+			"DailyPoints":   dailyPoints,
+			"PeakHoursData": peakHoursData,
 		},
 	})
 }
