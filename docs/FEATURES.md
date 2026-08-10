@@ -22,7 +22,6 @@
 The "Anti-Dashboard" vision puts friction-less capture first.
 - **Interactive Web UI Dashboard**: A true command center. Start focus sessions, tick off pending tasks, complete daily habits, and quick capture notes directly from the home grid without navigating away.
 - **Progressive Web App (PWA)**: Install Mindloop directly to your mobile or desktop home screen for a native app feel and lightning-fast access.
-- **Zen Mode (Hyper-Focus UI)**: Toggle a minimalist view that strips away peripheral information (habits, points, settings), leaving only your active Intent, focus timer, and a scratchpad.
 - **Vim-like Navigation**: Use `j` and `k` to scroll through tasks and habits, and `x` to mark them as completed instantly without touching your mouse.
 - **TUI Dashboard (`mindloop dash`)**: A beautiful terminal interface powered by Bubbletea that features a live-updating focus session timer and interactive habit toggling.
 
